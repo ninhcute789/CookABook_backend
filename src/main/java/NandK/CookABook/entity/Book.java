@@ -7,11 +7,13 @@ import jakarta.persistence.Id;
 import lombok.Data;
 
 @Entity
-@Data
-public class User {
+@Data  // Tự động tạo getter, setter, toString() nhờ Lombok
+public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private String email;
+
+    private String title;
+    private String author;
+    private Double price;
 }
