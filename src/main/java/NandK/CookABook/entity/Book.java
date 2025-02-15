@@ -6,14 +6,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.Data;
 
-@Entity
+@Entity  //annotation tao bang
 @Data  // Tự động tạo getter, setter, toString() nhờ Lombok
 public class Book {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     private String title;
     private String author;
     private Double price;
+    private String description;
 }

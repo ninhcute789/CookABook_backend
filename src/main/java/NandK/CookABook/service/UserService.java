@@ -2,8 +2,6 @@ package NandK.CookABook.service;
 
 import java.util.List;
 
-import javax.management.RuntimeErrorException;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -29,7 +27,7 @@ public class UserService {
     return userRepository.save(user);
     }
 
-    public List<User> getUsers(){
+    public List<User> getAllUsers(){
         return userRepository.findAll();
     }
 
