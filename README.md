@@ -1,2 +1,2 @@
 # CookABook
-thiết kế trang web TMĐT làm đề án
+the backend of website named "Cook A Book", wrote from Java Spring-boot
