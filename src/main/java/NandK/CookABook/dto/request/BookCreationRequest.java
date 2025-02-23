@@ -7,5 +7,7 @@ public class BookCreationRequest {
     private String title;
     private String author;
     private Double price;
+    private int stock;
     private String description;
+    private String coverImageUrl;
 }

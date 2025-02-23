@@ -5,8 +5,7 @@ import java.time.LocalDate;
 import lombok.Data;
 
 @Data
-public class UserCreationRequest {
-    private String username;
+public class UserUpdateRequest {
     private String password;
     private String firstName;
     private String lastName;
