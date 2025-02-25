@@ -1,6 +1,8 @@
 package NandK.CookABook.service;
 
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 import NandK.CookABook.dto.request.UserCreationRequest;
 import NandK.CookABook.dto.request.UserUpdateRequest;
@@ -26,40 +28,46 @@ public class UserService {
         user.setDob(request.getDob());
         user.setEmail(request.getEmail());
 
-    return userRepository.save(user);
+    return this.userRepository.save(user);
     }
 
     public List<User> getAllUsers(){
-        return userRepository.findAll();
+        return this.userRepository.findAll();
     }
 
     public User getUser(Long userId){
-        return userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User không tồn tại"));
+        // return this.userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User không tồn tại"));
+        Optional<User> user = this.userRepository.findById(userId);
+        if (user.isPresent()) {
+            return user.get();
+        } else {
+            return null;}
         }
 
-    public User updateUser(Long userId, UserUpdateRequest request) {
-        User user = getUser(userId);
-        
-        if (request.getPassword() != null && !request.getPassword().isEmpty() && !request.getPassword().isBlank()) {
-            user.setPassword(request.getPassword());
+    public User updateUser(UserUpdateRequest request) {
+        User user = this.getUser(request.getId());
+        if (user != null) {
+            if (request.getPassword() != null && !request.getPassword().isBlank()) {
+                user.setPassword(request.getPassword());
+            }
+            if (request.getFirstName() != null && !request.getFirstName().isBlank()) {
+                user.setFirstName(request.getFirstName());
+            }
+            if (request.getLastName() != null && !request.getLastName().isBlank()) {
+                user.setLastName(request.getLastName());
+            }
+            if (request.getDob() != null && !request.getDob().toString().isBlank()) {
+                user.setDob(request.getDob());
+            }
+            if (request.getEmail() != null && !request.getEmail().isBlank()) {
+                user.setEmail(request.getEmail());
+            }
+        user = this.userRepository.save(user);
         }
-        if (request.getFirstName() != null && !request.getFirstName().isEmpty() && !request.getFirstName().isBlank()) {
-            user.setFirstName(request.getFirstName());
-        }
-        if (request.getLastName() != null && !request.getLastName().isEmpty() && !request.getLastName().isBlank()) {
-            user.setLastName(request.getLastName());
-        }
-        if (request.getDob() != null && !request.getDob().toString().isEmpty() && !request.getDob().toString().isBlank()) {
-            user.setDob(request.getDob());
-        }
-        if (request.getEmail() != null && !request.getEmail().isEmpty() && !request.getEmail().isBlank()) {
-            user.setEmail(request.getEmail());
-        }
-        
-        return userRepository.save(user);
+        return user;
         }
 
     public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+        this.userRepository.deleteById(userId);
     }
 }
