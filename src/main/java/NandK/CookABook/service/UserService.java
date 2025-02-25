@@ -11,15 +11,15 @@ import NandK.CookABook.repository.UserRepository;
 
 @Service
 public class UserService {
-    
-    private final UserRepository userRepository; //final: khong the thay doi gia tri cua bien
-    
+
+    private final UserRepository userRepository; // final: khong the thay doi gia tri cua bien
+
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
-    public User createUser(UserCreationRequest request){
-    User user = new User();
+    public User createUser(UserCreationRequest request) {
+        User user = new User();
 
         user.setUsername(request.getUsername());
         user.setPassword(request.getPassword());
@@ -28,21 +28,23 @@ public class UserService {
         user.setDob(request.getDob());
         user.setEmail(request.getEmail());
 
-    return this.userRepository.save(user);
+        return this.userRepository.save(user);
     }
 
-    public List<User> getAllUsers(){
+    public List<User> getAllUsers() {
         return this.userRepository.findAll();
     }
 
-    public User getUser(Long userId){
-        // return this.userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User không tồn tại"));
+    public User getUser(Long userId) {
+        // return this.userRepository.findById(userId).orElseThrow(() -> new
+        // RuntimeException("User không tồn tại"));
         Optional<User> user = this.userRepository.findById(userId);
         if (user.isPresent()) {
             return user.get();
         } else {
-            return null;}
+            return null;
         }
+    }
 
     public User updateUser(UserUpdateRequest request) {
         User user = this.getUser(request.getId());
@@ -62,10 +64,10 @@ public class UserService {
             if (request.getEmail() != null && !request.getEmail().isBlank()) {
                 user.setEmail(request.getEmail());
             }
-        user = this.userRepository.save(user);
+            user = this.userRepository.save(user);
         }
         return user;
-        }
+    }
 
     public void deleteUser(Long userId) {
         this.userRepository.deleteById(userId);

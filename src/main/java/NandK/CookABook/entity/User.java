@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Entity
 @Table(name = "users")
-@Data //auto getter va setter
+@Data // auto getter va setter
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +22,5 @@ public class User {
     private String lastName;
     private LocalDate dob;
     private String email;
-
 
 }
