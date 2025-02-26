@@ -36,11 +36,18 @@ public class UserService {
     }
 
     public User getUser(Long userId) {
-        // return this.userRepository.findById(userId).orElseThrow(() -> new
-        // RuntimeException("User không tồn tại"));
         Optional<User> user = this.userRepository.findById(userId);
         if (user.isPresent()) {
             return user.get();
+        } else {
+            return null;
+        }
+    }
+
+    public User getUserByUsername(String username) {
+        User user = this.userRepository.findByUsername(username);
+        if (user != null) {
+            return user;
         } else {
             return null;
         }
