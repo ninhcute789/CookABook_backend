@@ -11,11 +11,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "authors")
-@Data
+@Getter
+@Setter
 public class Author {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +29,7 @@ public class Author {
     private LocalDate dateOfBirth;
     @Column(nullable = true)
     private LocalDate dateOfDeath;
-    
+
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Book> books;
 }

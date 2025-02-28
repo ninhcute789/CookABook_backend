@@ -1,8 +1,10 @@
 package NandK.CookABook.entity;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class RestResponse<T> {
     private int status;
     private String error;

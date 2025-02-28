@@ -2,9 +2,11 @@ package NandK.CookABook.dto.request;
 
 import java.time.LocalDate;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class UserCreationRequest {
     private String username;
     private String password;

@@ -1,9 +1,11 @@
 package NandK.CookABook.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Getter
+@Setter
 public class UserLoginRequest {
     @NotBlank(message = "Username không được để trống")
     private String username;

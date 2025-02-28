@@ -1,6 +1,7 @@
 package NandK.CookABook.config;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
@@ -34,8 +35,12 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
         RestResponse<Object> restResponse = new RestResponse<Object>();
         restResponse.setStatus(HttpStatus.UNAUTHORIZED.value());
-        restResponse.setError(authException.getCause().getMessage());
-        restResponse.setMessage("Token không hợp lệ (hết hạn, không tồn tại hoặc không đúng định dạng)");
+        String errorMessage = Optional.ofNullable(authException.getCause()).map(Throwable::getMessage)
+                .orElse(authException.getMessage());
+        restResponse.setError(errorMessage);
+
+        restResponse.setMessage(
+                "Token không hợp lệ (hết hạn, không tồn tại, không đúng định dạng hoặc không chứa quyền truy cập)");
 
         objectMapper.writeValue(response.getWriter(), restResponse);
     }
