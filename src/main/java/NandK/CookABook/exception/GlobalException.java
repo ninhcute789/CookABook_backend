@@ -24,7 +24,7 @@ public class GlobalException {
         RestResponse<Object> restResponse = new RestResponse<Object>();
         restResponse.setStatus(HttpStatus.BAD_REQUEST.value());
         restResponse.setError(exception.getMessage());
-        restResponse.setMessage("Exception...");
+        restResponse.setMessage("Xảy ra ngoại lệ...");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(restResponse); // tra ve status 400 va message tu kia
     }
 

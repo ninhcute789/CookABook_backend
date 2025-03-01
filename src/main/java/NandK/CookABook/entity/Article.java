@@ -12,10 +12,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "news")
+@Table(name = "articles")
 @Getter
 @Setter
-public class New {
+public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +24,6 @@ public class New {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String content;
 
-    private String author;
     private String imageURL;
     private Instant createdAt;
     private Instant updatedAt;

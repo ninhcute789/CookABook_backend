@@ -21,19 +21,24 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
-    private String author;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private Author author;
 
     @Column(columnDefinition = "MEDIUMTEXT") // Để lưu trữ dữ liệu dạng text dài
     private String description;
 
-    private double price;
+    private long price;
     private int stock;
-    private String imageURL; // URL ảnh bìa sách
+    private String imageUrl; // URL ảnh bìa sách
     private Instant createdAt;
     private Instant updatedAt;
     private String createBy;
     private String updateBy;
+
     @ManyToOne
     @JoinColumn(name = "category_id", nullable = false)
     private Category category;

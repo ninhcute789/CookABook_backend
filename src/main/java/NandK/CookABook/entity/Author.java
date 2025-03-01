@@ -24,11 +24,6 @@ public class Author {
     private Long id;
 
     private String name;
-    private String bio;
-    private String country;
-    private LocalDate dateOfBirth;
-    @Column(nullable = true)
-    private LocalDate dateOfDeath;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL)
     private List<Book> books;

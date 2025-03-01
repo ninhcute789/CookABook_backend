@@ -1,10 +1,10 @@
 package NandK.CookABook.repository;
 
-import NandK.CookABook.entity.Book;
+import NandK.CookABook.entity.Article;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Long> {
-    public Book findByTitle(String title);
+public interface ArticleRepository extends JpaRepository<Article, Long> {
+    public Article findByTitle(String title);
 }

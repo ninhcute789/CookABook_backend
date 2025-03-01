@@ -40,7 +40,7 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
 
         } else {// case success
             restResponse.setData(body);
-            restResponse.setMessage("Success");
+            restResponse.setMessage("Thành công");
         }
         return restResponse;
     }

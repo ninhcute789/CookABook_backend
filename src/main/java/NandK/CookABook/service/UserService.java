@@ -4,8 +4,9 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import NandK.CookABook.dto.request.UserCreationRequest;
-import NandK.CookABook.dto.request.UserUpdateRequest;
+
+import NandK.CookABook.dto.user.UserCreationRequest;
+import NandK.CookABook.dto.user.UserUpdateRequest;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.repository.UserRepository;
 
@@ -35,7 +36,7 @@ public class UserService {
         return this.userRepository.findAll();
     }
 
-    public User getUser(Long userId) {
+    public User getUserById(Long userId) {
         Optional<User> user = this.userRepository.findById(userId);
         if (user.isPresent()) {
             return user.get();
@@ -54,7 +55,7 @@ public class UserService {
     }
 
     public User updateUser(UserUpdateRequest request) {
-        User user = this.getUser(request.getId());
+        User user = this.getUserById(request.getId());
         if (user != null) {
             if (request.getPassword() != null && !request.getPassword().isBlank()) {
                 user.setPassword(request.getPassword());

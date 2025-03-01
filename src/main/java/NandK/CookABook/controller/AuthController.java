@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import NandK.CookABook.dto.request.UserLoginRequest;
 import NandK.CookABook.dto.response.ResLogin;
+import NandK.CookABook.dto.user.UserLoginRequest;
 import NandK.CookABook.utils.SecurityUtil;
 import jakarta.validation.Valid;
 

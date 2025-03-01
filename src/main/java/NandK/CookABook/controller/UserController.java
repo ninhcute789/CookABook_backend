@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.web.bind.annotation.RestController;
 
-import NandK.CookABook.dto.request.UserCreationRequest;
-import NandK.CookABook.dto.request.UserUpdateRequest;
+import NandK.CookABook.dto.user.UserCreationRequest;
+import NandK.CookABook.dto.user.UserUpdateRequest;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.UserService;
@@ -43,18 +43,16 @@ public class UserController {
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        // List<User> user = this.userService.getAllUsers();
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.getAllUsers());
     }
 
     @GetMapping("/{userId}")
     public ResponseEntity<User> getUser(@PathVariable Long userId) {
-        User user = this.userService.getUser(userId);
+        User user = this.userService.getUserById(userId);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         } else
             return ResponseEntity.status(HttpStatus.OK).body(user);
-        // return ResponseEntity.ok(user); //tra ve status 200 va user
     }
 
     @PutMapping
@@ -65,9 +63,6 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long userId) throws IdInvalidException {
-        if (userId >= 100) {
-            throw new IdInvalidException("Id không hợp lệ");
-        } // message duoc lay tu day
         this.userService.deleteUser(userId);
         return ResponseEntity.noContent().build(); // tra ve status 204
     }
