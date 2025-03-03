@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import NandK.CookABook.entity.RestResponse;
+import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.servlet.http.HttpServletResponse;
 
 @RestControllerAdvice
@@ -40,7 +41,8 @@ public class FormatRestResponse implements ResponseBodyAdvice<Object> {
 
         } else {// case success
             restResponse.setData(body);
-            restResponse.setMessage("Thành công");
+            ApiMessage apiMessage = returnType.getMethodAnnotation(ApiMessage.class);
+            restResponse.setMessage(apiMessage != null ? apiMessage.value() : "Thành công");
         }
         return restResponse;
     }

@@ -2,11 +2,16 @@ package NandK.CookABook.entity;
 
 import java.time.Instant;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import NandK.CookABook.utils.SecurityUtil;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,8 +30,28 @@ public class Article {
     private String content;
 
     private String imageURL;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7") // convert to GMT+7 timezone
     private Instant createdAt;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant updatedAt;
-    private String createBy;
-    private String updateBy;
+
+    private String createdBy;
+    private String updatedBy;
+
+    @PrePersist
+    public void beforeCreate() {
+        this.setCreatedBy(
+                SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get()
+                        : "anonymous");
+        this.setCreatedAt(Instant.now());
+    }
+
+    @PreUpdate
+    public void beforeUpdate() {
+        this.setUpdatedBy(
+                SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get()
+                        : "anonymous");
+        this.setUpdatedAt(Instant.now());
+    }
 }

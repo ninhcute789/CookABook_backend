@@ -16,7 +16,5 @@ public class ArticleCreationRequest {
     private String content;
     private String imageURL;
     private Instant createdAt;
-    private Instant updatedAt;
-    private String createBy;
-    private String updateBy;
+    private String createdBy;
 }
