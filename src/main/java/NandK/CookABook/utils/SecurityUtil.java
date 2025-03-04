@@ -18,6 +18,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import NandK.CookABook.dto.login.LoginResponse;
+
 @Service
 public class SecurityUtil {
 
@@ -32,21 +34,42 @@ public class SecurityUtil {
     @Value("${cookabook.jwt.base64-secret}")
     private String jwtKey;
 
-    @Value("${cookabook.jwt.token-validity-in-seconds}")
-    private long jwtExpiration;
+    @Value("${cookabook.jwt.access-token-validity-in-seconds}")
+    private long accessTokenExpiration;
 
-    public String createToken(Authentication authentication) {
+    @Value("${cookabook.jwt.refresh-token-validity-in-seconds}")
+    private long refreshTokenExpiration;
+
+    public String createAccessToken(Authentication authentication, LoginResponse.UserLoginInformation loginResponse) {
         // Instant la thu vien cua java.time dung de lay thoi gian hien tai
         Instant now = Instant.now();
-        // thoi gian token het han = thoi gian hien tai + 1 ngay
-        Instant validity = now.plus(this.jwtExpiration, ChronoUnit.SECONDS);
+        // thoi gian token het han = thoi gian hien tai + 100 ngay
+        Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
             .expiresAt(validity)
             .subject(authentication.getName())
-            .claim("cookabook", authentication)
+            .claim("user", loginResponse)
+            .build();
+
+        JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
+        return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    public String createRefreshToken(String username, LoginResponse loginResponse) {
+        // Instant la thu vien cua java.time dung de lay thoi gian hien tai
+        Instant now = Instant.now();
+        // thoi gian token het han = thoi gian hien tai + 1 ngay
+        Instant validity = now.plus(this.refreshTokenExpiration, ChronoUnit.SECONDS);
+
+        // @formatter:off
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+            .issuedAt(now)
+            .expiresAt(validity)
+            .subject(username)
+            .claim("user", loginResponse.getUser())
             .build();
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();

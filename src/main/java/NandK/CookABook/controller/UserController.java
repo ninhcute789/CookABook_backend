@@ -8,12 +8,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.turkraft.springfilter.boot.Filter;
 
 import NandK.CookABook.dto.pagination.ResultPagination;
+import NandK.CookABook.dto.user.UserFoundResponse;
 import NandK.CookABook.dto.user.UserCreationRequest;
+import NandK.CookABook.dto.user.UserCreationResponse;
 import NandK.CookABook.dto.user.UserUpdateRequest;
+import NandK.CookABook.dto.user.UserUpdateResponse;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.UserService;
 import NandK.CookABook.utils.annotation.ApiMessage;
+import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -32,7 +36,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/v1/users")
 
 public class UserController {
 
@@ -46,11 +50,17 @@ public class UserController {
 
     @PostMapping
     @ApiMessage("Tạo người dùng thành công")
-    public ResponseEntity<User> createUser(@RequestBody UserCreationRequest request) {
+    public ResponseEntity<UserCreationResponse> createUser(@Valid @RequestBody UserCreationRequest request)
+            throws IdInvalidException {
+        boolean isUserNameExist = this.userService.isUsernameExist(request.getUsername());
+        if (isUserNameExist) {
+            throw new IdInvalidException(
+                    "Username " + request.getUsername() + " đã tồn tại, vui lòng sử dụng username khác");
+        }
         String hashPassword = this.passwordEncoder.encode(request.getPassword()); // ham encode tra ra String
         request.setPassword(hashPassword);
         User user = this.userService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(user); // tra ve status 201 va user
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToUserCreationResponse(user));
     }
 
     @GetMapping
@@ -62,24 +72,37 @@ public class UserController {
 
     @GetMapping("/{userId}")
     @ApiMessage("Lấy người dùng thành công")
-    public ResponseEntity<User> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<UserFoundResponse> getUserById(@Valid @PathVariable Long userId) throws IdInvalidException {
         User user = this.userService.getUserById(userId);
         if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } else
-            return ResponseEntity.status(HttpStatus.OK).body(user);
+            throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserFindByIdResponse(user));
     }
 
     @PutMapping
     @ApiMessage("Cập nhật người dùng thành công")
-    public ResponseEntity<User> updateUserById(@RequestBody UserUpdateRequest request) {
-        User user = this.userService.updateUserById(request);
-        return ResponseEntity.status(HttpStatus.OK).body(user);
+    public ResponseEntity<UserUpdateResponse> updateUserById(@Valid @RequestBody UserUpdateRequest request)
+            throws IdInvalidException {
+        User user = this.userService.getUserById(request.getId());
+        if (user == null) {
+            throw new IdInvalidException("User với Id = " + request.getId() + " không tồn tại");
+        }
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            String hashPassword = this.passwordEncoder.encode(request.getPassword());
+            request.setPassword(hashPassword);
+        }
+        user = this.userService.updateUserById(request);
+        return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserUpdateResponse(user));
     }
 
     @DeleteMapping("/{userId}")
     @ApiMessage("Xóa người dùng thành công")
-    public ResponseEntity<Void> deleteUserById(@PathVariable Long userId) throws IdInvalidException {
+    public ResponseEntity<Void> deleteUserById(@Valid @PathVariable Long userId) throws IdInvalidException {
+        User user = this.userService.getUserById(userId);
+        if (user == null) {
+            throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
+        }
         this.userService.deleteUserById(userId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
