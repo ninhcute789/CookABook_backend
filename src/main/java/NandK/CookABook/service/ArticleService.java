@@ -8,7 +8,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import NandK.CookABook.dto.article.ArticleCreationRequest;
+import NandK.CookABook.dto.article.ArticleCreationResponse;
 import NandK.CookABook.dto.article.ArticleUpdateRequest;
+import NandK.CookABook.dto.article.ArticleUpdateResponse;
 import NandK.CookABook.dto.pagination.Meta;
 import NandK.CookABook.dto.pagination.ResultPagination;
 import NandK.CookABook.entity.Article;
@@ -31,6 +33,17 @@ public class ArticleService {
         article.setImageURL(request.getImageURL());
 
         return this.articleRepository.save(article);
+    }
+
+    public ArticleCreationResponse convertToArticleCreationResponse(Article article) {
+        ArticleCreationResponse response = new ArticleCreationResponse();
+        response.setId(article.getId());
+        response.setTitle(article.getTitle());
+        response.setContent(article.getContent());
+        response.setImageURL(article.getImageURL());
+        response.setCreatedBy(article.getCreatedBy());
+        response.setCreatedAt(article.getCreatedAt());
+        return response;
     }
 
     public ResultPagination getAllArticles(Specification<Article> spec, Pageable pageable) {
@@ -74,6 +87,17 @@ public class ArticleService {
         } else {
             return null;
         }
+    }
+
+    public ArticleUpdateResponse convertToArticleUpdateResponse(Article article) {
+        ArticleUpdateResponse response = new ArticleUpdateResponse();
+        response.setId(article.getId());
+        response.setTitle(article.getTitle());
+        response.setContent(article.getContent());
+        response.setImageURL(article.getImageURL());
+        response.setUpdatedBy(article.getUpdatedBy());
+        response.setUpdatedAt(article.getUpdatedAt());
+        return response;
     }
 
     public void deleteArticleById(Long articleId) {

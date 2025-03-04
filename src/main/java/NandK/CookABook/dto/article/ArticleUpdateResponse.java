@@ -1,19 +1,20 @@
 package NandK.CookABook.dto.article;
 
+import java.time.Instant;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ArticleUpdateRequest {
-
-    @NotNull(message = "Id không được để trống")
+public class ArticleUpdateResponse {
     private Long id;
-
     private String title;
     private String content;
     private String imageURL;
+    private String updatedBy;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    private Instant updatedAt;
 }
