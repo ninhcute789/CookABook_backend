@@ -1,7 +1,5 @@
 package NandK.CookABook.dto.article;
 
-import java.time.Instant;
-
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,6 +13,4 @@ public class ArticleCreationRequest {
 
     private String content;
     private String imageURL;
-    private Instant createdAt;
-    private String createdBy;
 }

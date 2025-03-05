@@ -16,15 +16,18 @@ import org.springframework.web.bind.annotation.RestController;
 import com.turkraft.springfilter.boot.Filter;
 
 import NandK.CookABook.dto.article.ArticleCreationRequest;
+import NandK.CookABook.dto.article.ArticleCreationResponse;
 import NandK.CookABook.dto.article.ArticleUpdateRequest;
+import NandK.CookABook.dto.article.ArticleUpdateResponse;
 import NandK.CookABook.dto.pagination.ResultPagination;
 import NandK.CookABook.entity.Article;
+import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.ArticleService;
 import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/articles")
+@RequestMapping("/api/v1/articles")
 public class ArticleController {
 
     private final ArticleService articleService;
@@ -35,8 +38,10 @@ public class ArticleController {
 
     @PostMapping
     @ApiMessage("Tạo bài viết thành công")
-    public ResponseEntity<Article> createArticle(@Valid @RequestBody ArticleCreationRequest request) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.articleService.createArticle(request));
+    public ResponseEntity<ArticleCreationResponse> createArticle(@Valid @RequestBody ArticleCreationRequest request) {
+        Article article = this.articleService.createArticle(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(this.articleService.convertToArticleCreationResponse(article));
     }
 
     @GetMapping
@@ -48,27 +53,32 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     @ApiMessage("Lấy bài viết thành công")
-    public ResponseEntity<Article> getArticleById(@Valid @PathVariable Long articleId) {
+    public ResponseEntity<Article> getArticleById(@Valid @PathVariable Long articleId) throws IdInvalidException {
         Article article = this.articleService.getArticleById(articleId);
         if (article == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } else
-            return ResponseEntity.status(HttpStatus.OK).body(article);
+            throw new IdInvalidException("Bài viết với id = " + articleId + " không tồn tại");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(article);
     }
 
     @PutMapping
     @ApiMessage("Cập nhật bài viết thành công")
-    public ResponseEntity<Article> updateArticleById(@Valid @RequestBody ArticleUpdateRequest request) {
+    public ResponseEntity<ArticleUpdateResponse> updateArticleById(@Valid @RequestBody ArticleUpdateRequest request)
+            throws IdInvalidException {
         Article article = this.articleService.updateArticleById(request);
         if (article == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        } else
-            return ResponseEntity.status(HttpStatus.OK).body(article);
+            throw new IdInvalidException("Bài viết với id = " + request.getId() + " không tồn tại");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(this.articleService.convertToArticleUpdateResponse(article));
     }
 
     @DeleteMapping("/{articleId}")
     @ApiMessage("Xóa bài viết thành công")
-    public ResponseEntity<Void> deleteArticleById(@Valid @PathVariable Long articleId) {
+    public ResponseEntity<Void> deleteArticleById(@Valid @PathVariable Long articleId) throws IdInvalidException {
+        Article article = this.articleService.getArticleById(articleId);
+        if (article == null) {
+            throw new IdInvalidException("Bài viết với id = " + articleId + " không tồn tại");
+        }
         this.articleService.deleteArticleById(articleId);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }

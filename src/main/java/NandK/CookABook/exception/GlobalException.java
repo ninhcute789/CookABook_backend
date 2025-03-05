@@ -12,14 +12,18 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import NandK.CookABook.entity.RestResponse;
 
 @RestControllerAdvice
 public class GlobalException {
 
-    @ExceptionHandler(value = { UsernameNotFoundException.class,
-            BadCredentialsException.class })
+    @ExceptionHandler(value = {
+            UsernameNotFoundException.class,
+            BadCredentialsException.class,
+            IdInvalidException.class
+    })
     public ResponseEntity<RestResponse<Object>> handleIdExceptions(Exception exception) {
         RestResponse<Object> restResponse = new RestResponse<Object>();
         restResponse.setStatus(HttpStatus.BAD_REQUEST.value());
@@ -40,6 +44,15 @@ public class GlobalException {
         List<String> errors = fieldError.stream().map(f -> f.getDefaultMessage()).collect(Collectors.toList());
         restResponse.setMessage(errors.size() > 1 ? errors : errors.get(0));
 
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(restResponse);
+    }
+
+    @ExceptionHandler(value = { NoResourceFoundException.class })
+    public ResponseEntity<RestResponse<Object>> handleNoResourceFoundException(Exception ex) {
+        RestResponse<Object> restResponse = new RestResponse<Object>();
+        restResponse.setStatus(HttpStatus.NOT_FOUND.value());
+        restResponse.setError(ex.getMessage());
+        restResponse.setMessage("URL có thể không tồn tại...");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(restResponse);
     }
 }

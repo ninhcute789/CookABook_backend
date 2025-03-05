@@ -24,6 +24,7 @@ public class Article {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     private String title;
 
     @Column(columnDefinition = "MEDIUMTEXT")
@@ -33,10 +34,10 @@ public class Article {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7") // convert to GMT+7 timezone
     private Instant createdAt;
+    private String createdBy;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant updatedAt;
-
-    private String createdBy;
     private String updatedBy;
 
     @PrePersist
