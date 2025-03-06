@@ -158,6 +158,9 @@ public class UserService {
             user.setRefreshToken(refreshToken);
             this.userRepository.save(user);
         }
+    }
 
+    public User getUserByRefreshTokenAndUsername(String refreshToken, String username) {
+        return this.userRepository.findByRefreshTokenAndUsername(refreshToken, username);
     }
 }

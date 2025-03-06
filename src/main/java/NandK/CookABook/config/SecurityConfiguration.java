@@ -18,7 +18,6 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
@@ -44,7 +43,8 @@ public class SecurityConfiguration {
         http.csrf(c -> c.disable()) // tat csrf
                 .cors(Customizer.withDefaults()) // cho phep cors
                 .authorizeHttpRequests(
-                        authz -> authz.requestMatchers("/", "/api/v1/auth/login").permitAll()
+                        authz -> authz.requestMatchers("/", "/api/v1/auth/login",
+                                "/api/v1/auth/refresh").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
@@ -62,16 +62,18 @@ public class SecurityConfiguration {
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // lay thong tin tu jwt nap vao authorities
         JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         grantedAuthoritiesConverter.setAuthorityPrefix("");
-        grantedAuthoritiesConverter.setAuthoritiesClaimName("user");
+        grantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter);
         return jwtAuthenticationConverter;
     }
 
+    // TODO: sua 2 khoi code duoi sang 1 file de tai su dung duoc trong SecurityUtil
     @Bean
-    public JwtDecoder jwtDecoder() {
+    public JwtDecoder jwtDecoder() { // ham chay dau tien khi chay chuong trinh
         NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
                 getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
         return token -> {

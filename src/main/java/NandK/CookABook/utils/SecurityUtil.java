@@ -2,8 +2,12 @@ package NandK.CookABook.utils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
@@ -16,7 +20,10 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.stereotype.Service;
+
+import com.nimbusds.jose.util.Base64;
 
 import NandK.CookABook.dto.login.LoginResponse;
 
@@ -40,17 +47,23 @@ public class SecurityUtil {
     @Value("${cookabook.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
-    public String createAccessToken(Authentication authentication, LoginResponse.UserLoginInformation loginResponse) {
+    public String createAccessToken(String username, LoginResponse.UserLoginInformation loginResponse) {
         // Instant la thu vien cua java.time dung de lay thoi gian hien tai
         Instant now = Instant.now();
         // thoi gian token het han = thoi gian hien tai + 100 ngay
         Instant validity = now.plus(this.accessTokenExpiration, ChronoUnit.SECONDS);
 
+        // hashcode authorities
+        List<String> authorities = new ArrayList<String>();
+        authorities.add("ROLE_USER_CREATE");
+        authorities.add("ROLE_USER_UPDATE");
+
         // @formatter:off
         JwtClaimsSet claims = JwtClaimsSet.builder()
             .issuedAt(now)
             .expiresAt(validity)
-            .subject(authentication.getName())
+            .subject(username)
+            .claim("authorities", authorities)
             .claim("user", loginResponse)
             .build();
 
@@ -74,6 +87,23 @@ public class SecurityUtil {
 
         JwsHeader jwsHeader = JwsHeader.with(JWT_ALGORITHM).build();
         return this.jwtEncoder.encode(JwtEncoderParameters.from(jwsHeader, claims)).getTokenValue();
+    }
+
+    // ham lay secret key
+    private SecretKey getSecretKey() {
+        byte[] keyBytes = Base64.from(jwtKey).decode();
+        return new SecretKeySpec(keyBytes, 0, keyBytes.length, JWT_ALGORITHM.getName());
+    }
+    // ham kiem tra refresh token
+    public Jwt checkValidRefreshToken(String refreshToken) {
+        NimbusJwtDecoder jwtDecoder = NimbusJwtDecoder.withSecretKey(
+                getSecretKey()).macAlgorithm(SecurityUtil.JWT_ALGORITHM).build();
+            try {
+                return jwtDecoder.decode(refreshToken);
+            } catch (Exception e) {
+                System.out.println(">>> Refresh Token error: " + e.getMessage());
+                throw e;
+            }
     }
 
     /**

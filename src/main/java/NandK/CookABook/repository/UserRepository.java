@@ -10,4 +10,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     public User findByUsername(String username);
 
     public boolean existsByUsername(String username);
+
+    public User findByRefreshTokenAndUsername(String refreshToken, String username);
 }

@@ -21,4 +21,13 @@ public class LoginResponse {
         private String username;
         private String name;
     }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserGetAccount {
+        private UserLoginInformation user;
+    }
+
 }

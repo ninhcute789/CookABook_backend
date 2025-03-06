@@ -19,7 +19,10 @@ public class UserCreationRequest {
     @NotBlank(message = "Tên không được để trống")
     private String name;
 
+    @NotBlank(message = "Giới tính không được để trống")
     private GenderEnum gender;
+
+    @NotBlank(message = "Ngày sinh không được để trống")
     private LocalDate dob;
 
     @NotBlank(message = "Email không được để trống")
