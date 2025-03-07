@@ -25,7 +25,7 @@ import org.springframework.stereotype.Service;
 
 import com.nimbusds.jose.util.Base64;
 
-import NandK.CookABook.dto.login.LoginResponse;
+import NandK.CookABook.dto.response.LoginResponse;
 
 @Service
 public class SecurityUtil {

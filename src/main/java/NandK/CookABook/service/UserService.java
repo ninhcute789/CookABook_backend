@@ -9,13 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.pagination.Meta;
-import NandK.CookABook.dto.pagination.ResultPagination;
-import NandK.CookABook.dto.user.UserCreationRequest;
-import NandK.CookABook.dto.user.UserCreationResponse;
-import NandK.CookABook.dto.user.UserFoundResponse;
-import NandK.CookABook.dto.user.UserUpdateRequest;
-import NandK.CookABook.dto.user.UserUpdateResponse;
+import NandK.CookABook.dto.request.UserCreationRequest;
+import NandK.CookABook.dto.request.UserUpdateRequest;
+import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.UserCreationResponse;
+import NandK.CookABook.dto.response.UserFoundResponse;
+import NandK.CookABook.dto.response.UserUpdateResponse;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.repository.UserRepository;
 
@@ -85,7 +84,7 @@ public class UserService {
     public ResultPagination getAllUsers(Specification<User> spec, Pageable pageable) {
         Page<User> users = this.userRepository.findAll(spec, pageable);
         ResultPagination result = new ResultPagination();
-        Meta meta = new Meta();
+        ResultPagination.Meta meta = new ResultPagination.Meta();
         // lay thong tin ve trang hien tai thong qua pageable tu client gui len
         meta.setPage(pageable.getPageNumber() + 1);
         meta.setPageSize(pageable.getPageSize());
