@@ -2,6 +2,7 @@ package NandK.CookABook.entity;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -11,7 +12,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -49,6 +52,9 @@ public class User {
 
     private String createdBy;
     private String updatedBy;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Article> articles;
 
     @PrePersist
     public void beforeCreate() {
