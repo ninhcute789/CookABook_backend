@@ -1,4 +1,4 @@
-package NandK.CookABook.entity;
+package NandK.CookABook.dto.response;
 
 import lombok.Getter;
 import lombok.Setter;

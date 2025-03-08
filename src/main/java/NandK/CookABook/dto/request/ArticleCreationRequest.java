@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.article;
+package NandK.CookABook.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;

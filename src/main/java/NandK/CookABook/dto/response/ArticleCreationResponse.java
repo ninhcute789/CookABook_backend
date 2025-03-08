@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.article;
+package NandK.CookABook.dto.response;
 
 import java.time.Instant;
 

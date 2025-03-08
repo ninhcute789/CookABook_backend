@@ -7,12 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.article.ArticleCreationRequest;
-import NandK.CookABook.dto.article.ArticleCreationResponse;
-import NandK.CookABook.dto.article.ArticleUpdateRequest;
-import NandK.CookABook.dto.article.ArticleUpdateResponse;
-import NandK.CookABook.dto.pagination.Meta;
-import NandK.CookABook.dto.pagination.ResultPagination;
+import NandK.CookABook.dto.request.ArticleCreationRequest;
+import NandK.CookABook.dto.request.ArticleUpdateRequest;
+import NandK.CookABook.dto.response.ArticleCreationResponse;
+import NandK.CookABook.dto.response.ArticleUpdateResponse;
+import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.entity.Article;
 import NandK.CookABook.repository.ArticleRepository;
 
@@ -49,7 +48,7 @@ public class ArticleService {
     public ResultPagination getAllArticles(Specification<Article> spec, Pageable pageable) {
         Page<Article> articles = this.articleRepository.findAll(spec, pageable);
         ResultPagination result = new ResultPagination();
-        Meta meta = new Meta();
+        ResultPagination.Meta meta = new ResultPagination.Meta();
 
         meta.setPage(pageable.getPageNumber() + 1);
         meta.setPageSize(pageable.getPageSize());

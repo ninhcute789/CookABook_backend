@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.user;
+package NandK.CookABook.dto.request;
 
 import java.time.LocalDate;
 
