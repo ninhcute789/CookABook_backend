@@ -15,7 +15,9 @@ import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.dto.response.UserCreationResponse;
 import NandK.CookABook.dto.response.UserFoundResponse;
 import NandK.CookABook.dto.response.UserUpdateResponse;
+import NandK.CookABook.entity.Article;
 import NandK.CookABook.entity.User;
+import NandK.CookABook.repository.ArticleRepository;
 import NandK.CookABook.repository.UserRepository;
 
 @Service
@@ -23,8 +25,11 @@ public class UserService {
 
     private final UserRepository userRepository; // final: khong the thay doi gia tri cua bien
 
-    public UserService(UserRepository userRepository) {
+    private final ArticleRepository articleRepository;
+
+    public UserService(UserRepository userRepository, ArticleRepository articleRepository) {
         this.userRepository = userRepository;
+        this.articleRepository = articleRepository;
     }
 
     public boolean isUsernameExist(String username) {
@@ -110,9 +115,9 @@ public class UserService {
     }
 
     public User getUserById(Long userId) {
-        Optional<User> user = this.userRepository.findById(userId);
-        if (user.isPresent()) {
-            return user.get();
+        Optional<User> userOptional = this.userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            return userOptional.get();
         } else {
             return null;
         }
@@ -148,6 +153,9 @@ public class UserService {
     }
 
     public void deleteUserById(Long userId) {
+        User user = this.getUserById(userId);
+        List<Article> articles = this.articleRepository.findByUser(user);
+        this.articleRepository.deleteAll(articles);
         this.userRepository.deleteById(userId);
     }
 

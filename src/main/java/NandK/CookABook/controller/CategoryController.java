@@ -5,7 +5,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import NandK.CookABook.dto.request.CategoryCreationRequest;
 import NandK.CookABook.dto.request.CategoryUpdateRequest;
-import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.entity.Category;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.CategoryService;

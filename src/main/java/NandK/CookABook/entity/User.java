@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import NandK.CookABook.utils.SecurityUtil;
 import NandK.CookABook.utils.constant.GenderEnum;
@@ -41,12 +42,14 @@ public class User {
 
     private LocalDate dob;
     private String email;
-    // private String avatar;
+    // private String avatarId;
+    // private String avatarURL;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createdAt;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant updatedAt;
 
@@ -54,6 +57,7 @@ public class User {
     private String updatedBy;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore // de tranh lap vo han
     private List<Article> articles;
 
     @PrePersist
