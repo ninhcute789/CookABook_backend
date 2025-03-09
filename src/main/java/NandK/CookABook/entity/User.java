@@ -2,8 +2,10 @@ package NandK.CookABook.entity;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import NandK.CookABook.utils.SecurityUtil;
 import NandK.CookABook.utils.constant.GenderEnum;
@@ -11,7 +13,9 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -38,17 +42,23 @@ public class User {
 
     private LocalDate dob;
     private String email;
-    // private String avatar;
+    // private String avatarId;
+    // private String avatarURL;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createdAt;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant updatedAt;
 
     private String createdBy;
     private String updatedBy;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @JsonIgnore // de tranh lap vo han
+    private List<Article> articles;
 
     @PrePersist
     public void beforeCreate() {

@@ -8,7 +8,7 @@ import org.springframework.http.server.ServletServerHttpResponse;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import NandK.CookABook.entity.RestResponse;
+import NandK.CookABook.dto.response.RestResponse;
 import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.servlet.http.HttpServletResponse;
 

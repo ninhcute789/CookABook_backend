@@ -1,9 +1,10 @@
-package NandK.CookABook.dto.user;
+package NandK.CookABook.dto.request;
 
 import java.time.LocalDate;
 
 import NandK.CookABook.utils.constant.GenderEnum;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,10 +20,10 @@ public class UserCreationRequest {
     @NotBlank(message = "Tên không được để trống")
     private String name;
 
-    @NotBlank(message = "Giới tính không được để trống")
+    @NotNull(message = "Giới tính không được để trống")
     private GenderEnum gender;
 
-    @NotBlank(message = "Ngày sinh không được để trống")
+    @NotNull(message = "Ngày sinh không được để trống")
     private LocalDate dob;
 
     @NotBlank(message = "Email không được để trống")

@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.login;
+package NandK.CookABook.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

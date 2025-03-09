@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.article;
+package NandK.CookABook.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -13,4 +13,11 @@ public class ArticleCreationRequest {
 
     private String content;
     private String imageURL;
+    private User user;
+
+    @Getter
+    @Setter
+    public static class User {
+        private Long id;
+    }
 }

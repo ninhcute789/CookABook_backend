@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.user;
+package NandK.CookABook.dto.response;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -18,6 +18,7 @@ public class UserCreationResponse {
     private GenderEnum gender;
     private LocalDate dob;
     private String email;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createdAt;
 }

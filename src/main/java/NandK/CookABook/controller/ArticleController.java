@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
-import NandK.CookABook.dto.article.ArticleCreationRequest;
-import NandK.CookABook.dto.article.ArticleCreationResponse;
-import NandK.CookABook.dto.article.ArticleUpdateRequest;
-import NandK.CookABook.dto.article.ArticleUpdateResponse;
-import NandK.CookABook.dto.pagination.ResultPagination;
+import NandK.CookABook.dto.request.ArticleCreationRequest;
+import NandK.CookABook.dto.request.ArticleUpdateRequest;
+import NandK.CookABook.dto.response.ArticleCreationResponse;
+import NandK.CookABook.dto.response.ArticleFoundResponse;
+import NandK.CookABook.dto.response.ArticleUpdateResponse;
+import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.entity.Article;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.ArticleService;
@@ -53,12 +54,13 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     @ApiMessage("Lấy bài viết thành công")
-    public ResponseEntity<Article> getArticleById(@Valid @PathVariable Long articleId) throws IdInvalidException {
+    public ResponseEntity<ArticleFoundResponse> getArticleById(@Valid @PathVariable Long articleId)
+            throws IdInvalidException {
         Article article = this.articleService.getArticleById(articleId);
         if (article == null) {
             throw new IdInvalidException("Bài viết với id = " + articleId + " không tồn tại");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(article);
+        return ResponseEntity.status(HttpStatus.OK).body(this.articleService.convertToArticleFoundResponse(article));
     }
 
     @PutMapping
