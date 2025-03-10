@@ -14,4 +14,11 @@ public class ArticleUpdateRequest {
     private String title;
     private String content;
     private String imageURL;
+    private User user;
+
+    @Getter
+    @Setter
+    public static class User {
+        private Long id;
+    }
 }

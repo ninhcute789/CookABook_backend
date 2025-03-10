@@ -17,6 +17,7 @@ public class UserUpdateResponse {
     private GenderEnum gender;
     private LocalDate dob;
     private String email;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant updatedAt;
 }

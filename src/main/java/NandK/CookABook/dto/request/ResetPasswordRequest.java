@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class ResetPasswordRequest {
     private String token;
+
     @NotBlank(message = "Mật khẩu không được để trống")
     private String newPassword;
 }

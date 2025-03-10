@@ -11,15 +11,20 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ArticleCreationResponse {
+@AllArgsConstructor
+@NoArgsConstructor
+public class ArticleFoundResponse {
     private Long id;
     private String title;
     private String content;
     // private String imageId;
     private String imageURL;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7") // convert to GMT+7 timezone
     private Instant createdAt;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
+    private Instant updatedAt;
 
     private User user;
 
