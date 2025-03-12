@@ -92,10 +92,10 @@ public class UserService {
         ResultPagination.Meta meta = new ResultPagination.Meta();
         // lay thong tin ve trang hien tai thong qua pageable tu client gui len
         meta.setPage(pageable.getPageNumber() + 1);
-        meta.setPageSize(pageable.getPageSize());
+        meta.setSize(pageable.getPageSize());
         // lay tong so trang va tong so phan tu tu database
-        meta.setTotalPage(users.getTotalPages());
-        meta.setTotalElement(users.getTotalElements());
+        meta.setTotalPages(users.getTotalPages());
+        meta.setTotalElements(users.getTotalElements());
         // set thong tin tra ra client
         result.setMeta(meta);
         // loai bo thong tin nhay cam
@@ -132,7 +132,7 @@ public class UserService {
         }
     }
 
-    public User updateUserById(UserUpdateRequest request) {
+    public User updateUser(UserUpdateRequest request) {
         User user = this.getUserById(request.getId());
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(request.getPassword());

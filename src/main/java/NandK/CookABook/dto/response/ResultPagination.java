@@ -13,8 +13,8 @@ public class ResultPagination {
     @Setter
     public static class Meta {
         private int page;
-        private int pageSize;
-        private int totalPage;
-        private long totalElement;
+        private int size;
+        private int totalPages;
+        private long totalElements;
     }
 }

@@ -11,7 +11,5 @@ import NandK.CookABook.entity.User;
 
 @Repository
 public interface ArticleRepository extends JpaRepository<Article, Long>, JpaSpecificationExecutor<Article> {
-    public Article findByTitle(String title);
-
     public List<Article> findByUser(User user);
 }
