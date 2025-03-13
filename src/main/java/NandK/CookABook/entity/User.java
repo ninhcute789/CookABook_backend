@@ -40,6 +40,7 @@ public class User {
     @Enumerated(EnumType.STRING) // luu gia tri cua Enum vao database theo dang String
     private GenderEnum gender; // tap hop cac hang so gioi tinh
 
+    private String avatar;
     private LocalDate dob;
     private String email;
     // private String avatarId;

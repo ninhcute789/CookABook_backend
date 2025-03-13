@@ -72,14 +72,14 @@ public class ArticleService {
         ResultPagination.Meta meta = new ResultPagination.Meta();
 
         meta.setPage(pageable.getPageNumber() + 1);
-        meta.setPageSize(pageable.getPageSize());
+        meta.setSize(pageable.getPageSize());
 
-        meta.setTotalPage(articles.getTotalPages());
-        meta.setTotalElement(articles.getTotalElements());
+        meta.setTotalPages(articles.getTotalPages());
+        meta.setTotalElements(articles.getTotalElements());
 
         result.setMeta(meta);
 
-        List<ArticleFoundResponse> listArticle = articles.getContent().stream().map(
+        List<ArticleFoundResponse> listArticles = articles.getContent().stream().map(
                 item -> new ArticleFoundResponse(
                         item.getId(),
                         item.getTitle(),
@@ -91,7 +91,7 @@ public class ArticleService {
                                 item.getUser().getId(),
                                 item.getUser().getName()) : null))
                 .collect(Collectors.toList());
-        result.setData(listArticle);
+        result.setData(listArticles);
         return result;
     }
 
@@ -122,7 +122,7 @@ public class ArticleService {
         return response;
     }
 
-    public Article updateArticleById(ArticleUpdateRequest request) {
+    public Article updateArticle(ArticleUpdateRequest request) {
         Article article = this.getArticleById(request.getId());
         if (article != null) {
             if (request.getTitle() != null && !request.getTitle().isBlank()) {

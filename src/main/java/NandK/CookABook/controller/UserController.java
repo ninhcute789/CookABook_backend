@@ -76,7 +76,7 @@ public class UserController {
 
     @PutMapping
     @ApiMessage("Cập nhật người dùng thành công")
-    public ResponseEntity<UserUpdateResponse> updateUserById(@Valid @RequestBody UserUpdateRequest request)
+    public ResponseEntity<UserUpdateResponse> updateUser(@Valid @RequestBody UserUpdateRequest request)
             throws IdInvalidException {
         User user = this.userService.getUserById(request.getId());
         if (user == null) {
@@ -86,7 +86,7 @@ public class UserController {
             String hashPassword = this.passwordEncoder.encode(request.getPassword());
             request.setPassword(hashPassword);
         }
-        user = this.userService.updateUserById(request);
+        user = this.userService.updateUser(request);
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserUpdateResponse(user));
     }
 
