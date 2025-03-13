@@ -46,7 +46,7 @@ public class ArticleController {
                 .body(this.articleService.convertToArticleCreationResponse(article));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @ApiMessage("Lấy danh sách bài viết thành công")
     public ResponseEntity<ResultPagination> getAllArticles(
             @Filter Specification<Article> spec, Pageable pageable) {
