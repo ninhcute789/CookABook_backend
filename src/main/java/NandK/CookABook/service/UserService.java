@@ -70,6 +70,7 @@ public class UserService {
         response.setGender(user.getGender());
         response.setDob(user.getDob());
         response.setEmail(user.getEmail());
+        response.setAvatar(user.getAvatar());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
         return response;
@@ -82,6 +83,7 @@ public class UserService {
         response.setGender(user.getGender());
         response.setDob(user.getDob());
         response.setEmail(user.getEmail());
+        response.setAvatar(user.getAvatar());
         response.setUpdatedAt(user.getUpdatedAt());
         return response;
     }
@@ -107,6 +109,7 @@ public class UserService {
                         item.getGender(),
                         item.getDob(),
                         item.getEmail(),
+                        item.getAvatar(),
                         item.getCreatedAt(),
                         item.getUpdatedAt()))
                 .collect(Collectors.toList());
@@ -148,6 +151,9 @@ public class UserService {
         }
         if (request.getEmail() != null && !request.getEmail().isBlank()) {
             user.setEmail(request.getEmail());
+        }
+        if (request.getAvatar() != null && !request.getAvatar().isBlank()) {
+            user.setAvatar(request.getAvatar());
         }
         return this.userRepository.save(user);
     }

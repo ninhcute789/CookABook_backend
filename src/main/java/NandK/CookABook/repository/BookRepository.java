@@ -11,5 +11,5 @@ import NandK.CookABook.entity.Book;
 public interface BookRepository extends JpaRepository<Book, Long> {
     public Book findByTitle(String title);
 
-    List<Book> findByAuthorsId(Long authorId);
+    // List<Book> findByAuthorsId(Long authorId);
 }

@@ -18,4 +18,5 @@ public class UserUpdateRequest {
     private GenderEnum gender;
     private LocalDate dob;
     private String email;
+    private String avatar;
 }
