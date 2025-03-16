@@ -73,7 +73,6 @@ public class ArticleService {
 
         meta.setPage(pageable.getPageNumber() + 1);
         meta.setSize(pageable.getPageSize());
-
         meta.setTotalPages(articles.getTotalPages());
         meta.setTotalElements(articles.getTotalElements());
 

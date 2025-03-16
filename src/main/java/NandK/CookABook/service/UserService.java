@@ -73,6 +73,12 @@ public class UserService {
         response.setAvatar(user.getAvatar());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
+        if (user.getArticles() != null) {
+            List<UserFoundResponse.Article> articles = user.getArticles().stream().map(
+                    item -> new UserFoundResponse.Article(item.getId(), item.getTitle()))
+                    .collect(Collectors.toList());
+            response.setArticles(articles);
+        }
         return response;
     }
 
@@ -111,7 +117,10 @@ public class UserService {
                         item.getEmail(),
                         item.getAvatar(),
                         item.getCreatedAt(),
-                        item.getUpdatedAt()))
+                        item.getUpdatedAt(),
+                        item.getArticles() != null ? item.getArticles().stream().map(
+                                article -> new UserFoundResponse.Article(article.getId(), article.getTitle()))
+                                .collect(Collectors.toList()) : null))
                 .collect(Collectors.toList());
         result.setData(listUser);
         return result;
@@ -158,9 +167,13 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
-    public void deleteUserById(Long userId) {
+    public List<Article> getArticlesByUserId(Long userId) {
         User user = this.getUserById(userId);
-        List<Article> articles = this.articleRepository.findByUser(user);
+        return this.articleRepository.findByUser(user);
+    }
+
+    public void deleteUserById(Long userId) {
+        List<Article> articles = this.getArticlesByUserId(userId);
         this.articleRepository.deleteAll(articles);
         this.userRepository.deleteById(userId);
     }

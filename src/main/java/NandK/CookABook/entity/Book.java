@@ -42,13 +42,13 @@ public class Book {
     // private String imageId;
     private String imageURL;
     private Double originalPrice;
-    private Double discountPrice;
     private Double discountPercentage;
+    private Double discountPrice;
     private Long stockQuantity;
-    private boolean available;
+    private Boolean available;
     // private Double rating;
     // private Long ratingCount;
-    private Long sold;
+    // private Long sold;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;

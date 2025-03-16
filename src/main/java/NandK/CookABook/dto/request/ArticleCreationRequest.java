@@ -7,7 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ArticleCreationRequest {
-
     @NotBlank(message = "Tiêu đề không được để trống")
     private String title;
 

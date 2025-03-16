@@ -14,4 +14,6 @@ public interface AuthorRepository extends JpaRepository<Author, Long>, JpaSpecif
 
     public boolean existsByName(String name);
 
+    public List<Author> findByIdIn(List<Long> ids); // lay ra nhieu tac gia theo list id
+
 }
