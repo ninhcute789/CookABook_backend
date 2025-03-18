@@ -75,7 +75,7 @@ public class UserService {
         response.setUpdatedAt(user.getUpdatedAt());
         if (user.getArticles() != null) {
             List<UserFoundResponse.Article> articles = user.getArticles().stream().map(
-                    item -> new UserFoundResponse.Article(item.getId(), item.getTitle()))
+                    item -> new UserFoundResponse.Article(item.getId()))
                     .collect(Collectors.toList());
             response.setArticles(articles);
         }
@@ -119,7 +119,7 @@ public class UserService {
                         item.getCreatedAt(),
                         item.getUpdatedAt(),
                         item.getArticles() != null ? item.getArticles().stream().map(
-                                article -> new UserFoundResponse.Article(article.getId(), article.getTitle()))
+                                article -> new UserFoundResponse.Article(article.getId()))
                                 .collect(Collectors.toList()) : null))
                 .collect(Collectors.toList());
         result.setData(listUser);

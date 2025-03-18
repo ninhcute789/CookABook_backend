@@ -1,5 +1,6 @@
 package NandK.CookABook.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -41,13 +42,9 @@ public class AuthorService {
         return this.authorRepository.save(author);
     }
 
-    // public void getNumberOfBooksByAuthorId(Long authorId) {
-    // Author author = this.getAuthorById(authorId);
-    // if (author != null) {
-    // List<Book> books = this.bookRepository.findByAuthorsId(authorId);
-    // author.setNumberOfBooks(books.size());
-    // }
-    // }
+    public Integer getNumberOfBooksByAuthorId(Long authorId) {
+        return bookRepository.countByAuthorId(authorId);
+    }
 
     public ResultPagination getAllAuthors(Specification<Author> spec, Pageable pageable) {
         Page<Author> authors = this.authorRepository.findAll(spec, pageable);
@@ -61,14 +58,24 @@ public class AuthorService {
 
         result.setMeta(meta);
 
-        List<AuthorFoundResponse> listAuthors = authors.getContent().stream().map(
-                item -> new AuthorFoundResponse(
-                        item.getId(),
-                        item.getName(),
-                        item.getNumberOfBooks(),
-                        item.getCreatedAt(),
-                        item.getUpdatedAt()))
-                .collect(Collectors.toList());
+        // List<AuthorFoundResponse> listAuthors = authors.getContent().stream().map(
+        // item -> new AuthorFoundResponse(
+        // item.getId(),
+        // item.getName(),
+        // item.getNumberOfBooks(),
+        // item.getCreatedAt(),
+        // item.getUpdatedAt()))
+        // .collect(Collectors.toList());
+        List<AuthorFoundResponse> listAuthors = new ArrayList<>();
+        for (Author author : authors.getContent()) {
+            AuthorFoundResponse authorFoundResponse = new AuthorFoundResponse();
+            authorFoundResponse.setId(author.getId());
+            authorFoundResponse.setName(author.getName());
+            authorFoundResponse.setNumberOfBooks(this.getNumberOfBooksByAuthorId(author.getId()));
+            authorFoundResponse.setCreatedAt(author.getCreatedAt());
+            authorFoundResponse.setUpdatedAt(author.getUpdatedAt());
+            listAuthors.add(authorFoundResponse);
+        }
         result.setData(listAuthors);
         return result;
     }
@@ -76,6 +83,7 @@ public class AuthorService {
     public Author getAuthorById(Long authorId) {
         Optional<Author> author = this.authorRepository.findById(authorId);
         if (author.isPresent()) {
+            author.get().setNumberOfBooks(this.getNumberOfBooksByAuthorId(authorId));
             return author.get();
         } else {
             return null;

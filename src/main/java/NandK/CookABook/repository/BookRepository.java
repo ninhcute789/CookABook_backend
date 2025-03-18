@@ -12,4 +12,7 @@ import NandK.CookABook.entity.Book;
 public interface BookRepository extends JpaRepository<Book, Long>, JpaSpecificationExecutor<Book> {
     public Book findByTitle(String title);
 
+    public List<Book> findByAuthorId(Long authorId);
+
+    public Integer countByAuthorId(Long authorId);
 }
