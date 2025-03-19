@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import NandK.CookABook.dto.request.ForgotPasswordRequest;
-import NandK.CookABook.dto.request.UserLoginRequest;
+import NandK.CookABook.dto.request.user.UserLoginRequest;
 import NandK.CookABook.dto.response.LoginResponse;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;

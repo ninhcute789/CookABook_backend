@@ -11,10 +11,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.request.CategoryCreationRequest;
-import NandK.CookABook.dto.request.CategoryUpdateRequest;
-import NandK.CookABook.dto.response.CategoryFoundResponse;
+import NandK.CookABook.dto.request.category.CategoryCreationRequest;
+import NandK.CookABook.dto.request.category.CategoryUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.category.CategoryFoundResponse;
 import NandK.CookABook.repository.CategoryRepository;
 
 @Service
@@ -83,6 +83,10 @@ public class CategoryService {
     }
 
     public void deleteCategoryById(Long categoryId) {
+        // Xóa tất cả các sách liên quan đến danh mục trước khi xóa danh mục
+        Category category = this.getCategoryById(categoryId);
+        category.getBooks().forEach(book -> book.getCategories().remove(category));
+        // Xóa danh mục
         this.categoryRepository.deleteById(categoryId);
     }
 }

@@ -1,24 +1,23 @@
-package NandK.CookABook.dto.response;
+package NandK.CookABook.dto.response.user;
 
 import java.time.Instant;
+import java.time.LocalDate;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import lombok.AllArgsConstructor;
+import NandK.CookABook.utils.constant.GenderEnum;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class CategoryFoundResponse {
+public class UserUpdateResponse {
     private Long id;
     private String name;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
-    private Instant createdAt;
+    private GenderEnum gender;
+    private LocalDate dob;
+    private String email;
+    private String avatar;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant updatedAt;

@@ -3,17 +3,16 @@ package NandK.CookABook.service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.request.AuthorCreationRequest;
-import NandK.CookABook.dto.request.AuthorUpdateRequest;
-import NandK.CookABook.dto.response.AuthorFoundResponse;
+import NandK.CookABook.dto.request.author.AuthorCreationRequest;
+import NandK.CookABook.dto.request.author.AuthorUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.author.AuthorFoundResponse;
 import NandK.CookABook.entity.Author;
 import NandK.CookABook.entity.Book;
 import NandK.CookABook.repository.AuthorRepository;
@@ -21,6 +20,7 @@ import NandK.CookABook.repository.BookRepository;
 
 @Service
 public class AuthorService {
+
     private final AuthorRepository authorRepository;
     private final BookRepository bookRepository;
 
@@ -58,14 +58,6 @@ public class AuthorService {
 
         result.setMeta(meta);
 
-        // List<AuthorFoundResponse> listAuthors = authors.getContent().stream().map(
-        // item -> new AuthorFoundResponse(
-        // item.getId(),
-        // item.getName(),
-        // item.getNumberOfBooks(),
-        // item.getCreatedAt(),
-        // item.getUpdatedAt()))
-        // .collect(Collectors.toList());
         List<AuthorFoundResponse> listAuthors = new ArrayList<>();
         for (Author author : authors.getContent()) {
             AuthorFoundResponse authorFoundResponse = new AuthorFoundResponse();
@@ -92,17 +84,18 @@ public class AuthorService {
 
     public Author updateAuthor(AuthorUpdateRequest request) {
         Author author = this.getAuthorById(request.getId());
-        if (author != null) {
-            if (request.getName() != null && !request.getName().isBlank()) {
-                author.setName(request.getName());
-            }
-            return this.authorRepository.save(author);
-        } else {
-            return null;
+        if (request.getName() != null && !request.getName().isBlank()) {
+            author.setName(request.getName());
         }
+        return this.authorRepository.save(author);
     }
 
     public void deleteAuthorById(Long authorId) {
-        this.authorRepository.deleteById(authorId);
+        Author author = this.getAuthorById(authorId);
+        for (Book book : author.getBooks()) {
+            book.setAuthor(null);
+            this.bookRepository.save(book);
+        }
+        this.authorRepository.delete(author);
     }
 }

@@ -9,36 +9,62 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.request.BookCreationRequest;
-import NandK.CookABook.dto.request.BookUpdateRequest;
-import NandK.CookABook.dto.response.BookCreationResponse;
-import NandK.CookABook.dto.response.BookFoundResponse;
-import NandK.CookABook.dto.response.BookUpdateResponse;
+import NandK.CookABook.dto.request.author.AuthorCreationRequest;
+import NandK.CookABook.dto.request.book.BookCreationRequest;
+import NandK.CookABook.dto.request.book.BookUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.book.BookCreationResponse;
+import NandK.CookABook.dto.response.book.BookFoundResponse;
+import NandK.CookABook.dto.response.book.BookUpdateResponse;
 import NandK.CookABook.entity.Author;
 import NandK.CookABook.entity.Book;
+import NandK.CookABook.entity.Category;
 import NandK.CookABook.repository.AuthorRepository;
 import NandK.CookABook.repository.BookRepository;
+import NandK.CookABook.repository.CategoryRepository;
 
 @Service
 public class BookService {
+
+    private final AuthorService authorService;
+
     private final BookRepository bookRepository;
 
     private final AuthorRepository authorRepository;
 
-    public BookService(BookRepository bookRepository, AuthorRepository authorRepository) {
+    private final CategoryRepository categoryRepository;
+
+    public BookService(BookRepository bookRepository, AuthorRepository authorRepository, AuthorService authorService,
+            CategoryRepository categoryRepository) {
         this.bookRepository = bookRepository;
         this.authorRepository = authorRepository;
+        this.authorService = authorService;
+        this.categoryRepository = categoryRepository;
     }
 
     public Book createBook(BookCreationRequest request) {
         Book book = new Book();
         // check author
-        if (request.getAuthor() != null && request.getAuthor().getId() != null) {
-            Optional<Author> authorOptional = this.authorRepository.findById(request.getAuthor().getId());
-            book.setAuthor(authorOptional.isPresent() ? authorOptional.get() : null);
+        if (request.getAuthor() != null && request.getAuthor().getName() != null) {
+            Author author = this.authorRepository.findByName(request.getAuthor().getName());
+            if (author == null) {
+                AuthorCreationRequest requestAuthor = new AuthorCreationRequest(request.getAuthor().getName());
+                author = this.authorService.createAuthor(requestAuthor);
+                book.setAuthor(author);
+            } else {
+                book.setAuthor(author);
+            }
         } else {
             book.setAuthor(null);
+        }
+        // check category
+        if (request.getCategories() != null) {
+            List<Long> categoryIds = request.getCategories().stream().map(category -> category.getId())
+                    .collect(Collectors.toList());
+            List<Category> categories = this.categoryRepository.findByIdIn(categoryIds);
+            book.setCategories(categories);
+        } else {
+            book.setCategories(null);
         }
         book.setTitle(request.getTitle());
         book.setPublisher(request.getPublisher());
@@ -50,15 +76,13 @@ public class BookService {
         book.setImageURL(request.getImageURL());
         book.setOriginalPrice(request.getOriginalPrice());
         book.setDiscountPercentage(request.getDiscountPercentage());
-        if (book.getDiscountPercentage() != null) {
-            book.setDiscountPrice(
-                    book.getOriginalPrice() - (book.getOriginalPrice() * book.getDiscountPercentage() / 100));
-        }
+        book.setDiscountPrice((int) Math.round(
+                book.getOriginalPrice() -
+                        (book.getOriginalPrice() * book.getDiscountPercentage() / 100)));
         book.setStockQuantity(request.getStockQuantity());
         book.setAvailable(request.getAvailable());
         book.setDescription(request.getDescription());
         book.setCoverType(request.getCoverType());
-        // book.setCategory(request.getCategory());
 
         return this.bookRepository.save(book);
     }
@@ -88,9 +112,13 @@ public class BookService {
             author.setName(book.getAuthor().getName());
             response.setAuthor(author);
         }
+        if (book.getCategories() != null) {
+            List<BookCreationResponse.Category> categories = book.getCategories().stream().map(
+                    item -> new BookCreationResponse.Category(item.getId(), item.getName()))
+                    .collect(Collectors.toList());
+            response.setCategories(categories);
+        }
         response.setCreatedAt(book.getCreatedAt());
-        // response.setCategory(book.getCategory());
-
         return response;
     }
 
@@ -128,7 +156,12 @@ public class BookService {
                         item.getUpdatedAt(),
                         item.getAuthor() != null ? new BookFoundResponse.Author(
                                 item.getAuthor().getId(),
-                                item.getAuthor().getName()) : null))
+                                item.getAuthor().getName()) : null,
+                        item.getCategories() != null ? item.getCategories().stream().map(
+                                category -> new BookFoundResponse.Category(
+                                        category.getId(),
+                                        category.getName()))
+                                .collect(Collectors.toList()) : null))
                 .collect(Collectors.toList());
         result.setData(listBooks);
         return result;
@@ -170,8 +203,12 @@ public class BookService {
             author.setName(book.getAuthor().getName());
             response.setAuthor(author);
         }
-        // response.setCategory(book.getCategory());
-
+        if (book.getCategories() != null) {
+            List<BookFoundResponse.Category> categories = book.getCategories().stream().map(
+                    item -> new BookFoundResponse.Category(item.getId(), item.getName()))
+                    .collect(Collectors.toList());
+            response.setCategories(categories);
+        }
         return response;
     }
 
@@ -179,11 +216,26 @@ public class BookService {
         Book book = this.getBookById(request.getId());
         if (book != null) {
             // check author
-            if (request.getAuthor() != null && request.getAuthor().getId() != null) {
-                Optional<Author> authorOptional = this.authorRepository.findById(request.getAuthor().getId());
-                book.setAuthor(authorOptional.isPresent() ? authorOptional.get() : null);
+            if (request.getAuthor() != null && request.getAuthor().getName() != null) {
+                Author author = this.authorRepository.findByName(request.getAuthor().getName());
+                if (author == null) {
+                    AuthorCreationRequest requestAuthor = new AuthorCreationRequest(request.getAuthor().getName());
+                    author = this.authorService.createAuthor(requestAuthor);
+                    book.setAuthor(author);
+                } else {
+                    book.setAuthor(author);
+                }
             } else {
                 book.setAuthor(null);
+            }
+            // check category
+            if (request.getCategories() != null) {
+                List<Long> categoryIds = request.getCategories().stream().map(category -> category.getId())
+                        .collect(Collectors.toList());
+                List<Category> categories = this.categoryRepository.findByIdIn(categoryIds);
+                book.setCategories(categories);
+            } else {
+                book.setCategories(null);
             }
             if (request.getTitle() != null && !request.getTitle().isBlank()) {
                 book.setTitle(request.getTitle());
@@ -215,9 +267,12 @@ public class BookService {
             if (request.getDiscountPercentage() != null) {
                 book.setDiscountPercentage(request.getDiscountPercentage());
             }
-            if (book.getDiscountPercentage() != null) {
-                book.setDiscountPrice(
-                        book.getOriginalPrice() - (book.getOriginalPrice() * book.getDiscountPercentage() / 100));
+            if (request.getOriginalPrice() != null || request.getDiscountPercentage() != null) {
+                book.setDiscountPrice((int) Math.round(
+                        book.getOriginalPrice() -
+                                (book.getOriginalPrice() * book.getDiscountPercentage() / 100)));
+            } else if (request.getDiscountPercentage() == null) {
+                book.setDiscountPrice(null);
             }
             if (request.getStockQuantity() != null) {
                 book.setStockQuantity(request.getStockQuantity());
@@ -231,8 +286,6 @@ public class BookService {
             if (request.getCoverType() != null) {
                 book.setCoverType(request.getCoverType());
             }
-            // book.setCategory(request.getCategory());
-
             return this.bookRepository.save(book);
         } else {
             return null;
@@ -265,12 +318,20 @@ public class BookService {
             author.setName(book.getAuthor().getName());
             response.setAuthor(author);
         }
-        // response.setCategory(book.getCategory());
-
+        if (book.getCategories() != null) {
+            List<BookUpdateResponse.Category> categories = book.getCategories().stream().map(
+                    item -> new BookUpdateResponse.Category(item.getId(), item.getName()))
+                    .collect(Collectors.toList());
+            response.setCategories(categories);
+        }
         return response;
     }
 
     public void deleteBookById(Long bookId) {
-        this.bookRepository.deleteById(bookId);
+        // xóa tất cả các danh mục liên quan đến sách trước khi xóa sách
+        Book book = this.getBookById(bookId);
+        book.getCategories().forEach(category -> category.getBooks().remove(book));
+        // xóa sách
+        this.bookRepository.delete(book);
     }
 }
