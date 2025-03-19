@@ -1,6 +1,11 @@
-package NandK.CookABook.dto.request;
+package NandK.CookABook.dto.request.book;
+
+import java.util.List;
 
 import NandK.CookABook.utils.constant.CoverTypeEnum;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -22,10 +27,13 @@ public class BookCreationRequest {
     private String imageURL;
 
     @NotNull(message = "Giá gốc không được để trống")
-    private Double originalPrice;
+    @Min(value = 1, message = "Giá gốc phải là số nguyên dương")
+    private Integer originalPrice;
 
+    @NotNull(message = "Phần trăm giảm không được để trống, không giảm thì nhập 0")
+    @DecimalMin(value = "0.0", message = "Phần trăm giảm không được âm")
+    @DecimalMax(value = "100.0", message = "Phần trăm giảm không được lớn hơn 100")
     private Double discountPercentage;
-    // private Double discountPrice;
 
     @NotNull(message = "Số lượng không được để trống")
     private Long stockQuantity;
@@ -36,17 +44,17 @@ public class BookCreationRequest {
     private String description;
     private CoverTypeEnum coverType;
     private Author author;
-    // private Category category;
+    private List<Category> categories;
 
     @Getter
     @Setter
     public static class Author {
-        private Long id;
+        private String name;
     }
 
-    // @Getter
-    // @Setter
-    // public static class Category {
-    // private Long id;
-    // }
+    @Getter
+    @Setter
+    public static class Category {
+        private Long id;
+    }
 }

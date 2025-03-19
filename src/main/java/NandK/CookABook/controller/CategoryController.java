@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
-import NandK.CookABook.dto.request.CategoryCreationRequest;
-import NandK.CookABook.dto.request.CategoryUpdateRequest;
+import NandK.CookABook.dto.request.category.CategoryCreationRequest;
+import NandK.CookABook.dto.request.category.CategoryUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.entity.Category;
 import NandK.CookABook.exception.IdInvalidException;
@@ -46,7 +46,7 @@ public class CategoryController {
         return ResponseEntity.ok(this.categoryService.createCategory(request));
     }
 
-    @GetMapping
+    @GetMapping("/all")
     @ApiMessage("Lấy danh sách danh mục thành công")
     public ResponseEntity<ResultPagination> getAllCategories(
             @Filter Specification<Category> spec, Pageable pageable) {
@@ -68,10 +68,16 @@ public class CategoryController {
     @ApiMessage("Cập nhật danh mục thành công")
     public ResponseEntity<Category> updateCategory(@Valid @RequestBody CategoryUpdateRequest request)
             throws IdInvalidException {
-        Category category = this.categoryService.updateCategory(request);
+        Category category = this.categoryService.getCategoryById(request.getId());
         if (category == null) {
             throw new IdInvalidException("Danh mục với id = " + request.getId() + " không tồn tại");
         }
+        boolean isCategoryNameExist = this.categoryService.isCategoryNameExist(request.getName());
+        if (isCategoryNameExist) {
+            throw new IdInvalidException(
+                    "Danh mục với tên = " + request.getName() + " đã tồn tại, vui lòng sử dụng tên khác");
+        }
+        category = this.categoryService.updateCategory(request);
         return ResponseEntity.ok(category);
     }
 

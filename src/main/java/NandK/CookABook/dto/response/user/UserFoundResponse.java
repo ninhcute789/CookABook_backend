@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.response;
+package NandK.CookABook.dto.response.user;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -39,6 +39,5 @@ public class UserFoundResponse {
     @NoArgsConstructor
     public static class Article {
         private Long id;
-        private String title;
     }
 }

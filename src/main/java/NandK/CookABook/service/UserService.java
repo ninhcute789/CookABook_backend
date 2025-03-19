@@ -9,12 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.request.UserCreationRequest;
-import NandK.CookABook.dto.request.UserUpdateRequest;
+import NandK.CookABook.dto.request.user.UserCreationRequest;
+import NandK.CookABook.dto.request.user.UserUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
-import NandK.CookABook.dto.response.UserCreationResponse;
-import NandK.CookABook.dto.response.UserFoundResponse;
-import NandK.CookABook.dto.response.UserUpdateResponse;
+import NandK.CookABook.dto.response.user.UserCreationResponse;
+import NandK.CookABook.dto.response.user.UserFoundResponse;
+import NandK.CookABook.dto.response.user.UserUpdateResponse;
 import NandK.CookABook.entity.Article;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.repository.ArticleRepository;
@@ -75,7 +75,7 @@ public class UserService {
         response.setUpdatedAt(user.getUpdatedAt());
         if (user.getArticles() != null) {
             List<UserFoundResponse.Article> articles = user.getArticles().stream().map(
-                    item -> new UserFoundResponse.Article(item.getId(), item.getTitle()))
+                    item -> new UserFoundResponse.Article(item.getId()))
                     .collect(Collectors.toList());
             response.setArticles(articles);
         }
@@ -119,7 +119,7 @@ public class UserService {
                         item.getCreatedAt(),
                         item.getUpdatedAt(),
                         item.getArticles() != null ? item.getArticles().stream().map(
-                                article -> new UserFoundResponse.Article(article.getId(), article.getTitle()))
+                                article -> new UserFoundResponse.Article(article.getId()))
                                 .collect(Collectors.toList()) : null))
                 .collect(Collectors.toList());
         result.setData(listUser);
@@ -167,13 +167,8 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
-    public List<Article> getArticlesByUserId(Long userId) {
-        User user = this.getUserById(userId);
-        return this.articleRepository.findByUser(user);
-    }
-
     public void deleteUserById(Long userId) {
-        List<Article> articles = this.getArticlesByUserId(userId);
+        List<Article> articles = this.articleRepository.findByUserId(userId);
         this.articleRepository.deleteAll(articles);
         this.userRepository.deleteById(userId);
     }

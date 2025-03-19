@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
-import NandK.CookABook.dto.request.BookCreationRequest;
-import NandK.CookABook.dto.request.BookUpdateRequest;
-import NandK.CookABook.dto.response.BookCreationResponse;
-import NandK.CookABook.dto.response.BookFoundResponse;
-import NandK.CookABook.dto.response.BookUpdateResponse;
+import NandK.CookABook.dto.request.book.BookCreationRequest;
+import NandK.CookABook.dto.request.book.BookUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.book.BookCreationResponse;
+import NandK.CookABook.dto.response.book.BookFoundResponse;
+import NandK.CookABook.dto.response.book.BookUpdateResponse;
 import NandK.CookABook.entity.Book;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.BookService;

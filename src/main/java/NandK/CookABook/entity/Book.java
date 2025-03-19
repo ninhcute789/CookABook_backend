@@ -39,11 +39,10 @@ public class Book {
     private Integer numberOfPages;
     private Integer weight;
     private String language;
-    // private String imageId;
     private String imageURL;
-    private Double originalPrice;
+    private Integer originalPrice;
     private Double discountPercentage;
-    private Double discountPrice;
+    private Integer discountPrice;
     private Long stockQuantity;
     private Boolean available;
     // private Double rating;

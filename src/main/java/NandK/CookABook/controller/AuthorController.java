@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
-import NandK.CookABook.dto.request.AuthorCreationRequest;
-import NandK.CookABook.dto.request.AuthorUpdateRequest;
+import NandK.CookABook.dto.request.author.AuthorCreationRequest;
+import NandK.CookABook.dto.request.author.AuthorUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.entity.Author;
 import NandK.CookABook.exception.IdInvalidException;
@@ -66,16 +66,22 @@ public class AuthorController {
     @ApiMessage("Cập nhật tác giả thành công")
     public ResponseEntity<Author> updateAuthor(@Valid @RequestBody AuthorUpdateRequest request)
             throws IdInvalidException {
-        Author author = this.authorService.updateAuthor(request);
+        Author author = this.authorService.getAuthorById(request.getId());
         if (author == null) {
             throw new IdInvalidException("Tác giả với id = " + request.getId() + " không tồn tại");
         }
+        boolean isAuthorNameExist = this.authorService.isAuthorNameExist(request.getName());
+        if (isAuthorNameExist) {
+            throw new IdInvalidException(
+                    "Tác giả với tên = " + request.getName() + " đã tồn tại, vui lòng sử dụng tên khác");
+        }
+        author = this.authorService.updateAuthor(request);
         return ResponseEntity.ok(author);
     }
 
     @DeleteMapping("/{authorId}")
     @ApiMessage("Xóa tác giả thành công")
-    public ResponseEntity<String> deleteAuthor(@Valid @PathVariable Long authorId)
+    public ResponseEntity<Void> deleteAuthorById(@Valid @PathVariable Long authorId)
             throws IdInvalidException {
         Author author = this.authorService.getAuthorById(authorId);
         if (author == null) {
