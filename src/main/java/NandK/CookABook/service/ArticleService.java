@@ -9,12 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.request.ArticleCreationRequest;
-import NandK.CookABook.dto.request.ArticleUpdateRequest;
-import NandK.CookABook.dto.response.ArticleCreationResponse;
-import NandK.CookABook.dto.response.ArticleFoundResponse;
-import NandK.CookABook.dto.response.ArticleUpdateResponse;
+import NandK.CookABook.dto.request.article.ArticleCreationRequest;
+import NandK.CookABook.dto.request.article.ArticleUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.article.ArticleCreationResponse;
+import NandK.CookABook.dto.response.article.ArticleFoundResponse;
+import NandK.CookABook.dto.response.article.ArticleUpdateResponse;
 import NandK.CookABook.entity.Article;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.repository.ArticleRepository;
@@ -72,14 +72,13 @@ public class ArticleService {
         ResultPagination.Meta meta = new ResultPagination.Meta();
 
         meta.setPage(pageable.getPageNumber() + 1);
-        meta.setPageSize(pageable.getPageSize());
-
-        meta.setTotalPage(articles.getTotalPages());
-        meta.setTotalElement(articles.getTotalElements());
+        meta.setSize(pageable.getPageSize());
+        meta.setTotalPages(articles.getTotalPages());
+        meta.setTotalElements(articles.getTotalElements());
 
         result.setMeta(meta);
 
-        List<ArticleFoundResponse> listArticle = articles.getContent().stream().map(
+        List<ArticleFoundResponse> listArticles = articles.getContent().stream().map(
                 item -> new ArticleFoundResponse(
                         item.getId(),
                         item.getTitle(),
@@ -91,7 +90,7 @@ public class ArticleService {
                                 item.getUser().getId(),
                                 item.getUser().getName()) : null))
                 .collect(Collectors.toList());
-        result.setData(listArticle);
+        result.setData(listArticles);
         return result;
     }
 
@@ -122,7 +121,7 @@ public class ArticleService {
         return response;
     }
 
-    public Article updateArticleById(ArticleUpdateRequest request) {
+    public Article updateArticle(ArticleUpdateRequest request) {
         Article article = this.getArticleById(request.getId());
         if (article != null) {
             if (request.getTitle() != null && !request.getTitle().isBlank()) {

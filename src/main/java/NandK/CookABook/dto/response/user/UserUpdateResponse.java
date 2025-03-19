@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.response;
+package NandK.CookABook.dto.response.user;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -11,14 +11,14 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserCreationResponse {
+public class UserUpdateResponse {
     private Long id;
-    private String username;
     private String name;
     private GenderEnum gender;
     private LocalDate dob;
     private String email;
+    private String avatar;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
-    private Instant createdAt;
+    private Instant updatedAt;
 }

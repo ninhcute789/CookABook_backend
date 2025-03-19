@@ -1,4 +1,4 @@
-package NandK.CookABook.dto.request;
+package NandK.CookABook.dto.request.user;
 
 import java.time.LocalDate;
 
@@ -18,4 +18,5 @@ public class UserUpdateRequest {
     private GenderEnum gender;
     private LocalDate dob;
     private String email;
+    private String avatar;
 }

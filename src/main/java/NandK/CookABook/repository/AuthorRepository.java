@@ -1,18 +1,15 @@
 package NandK.CookABook.repository;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
-import NandK.CookABook.entity.Category;
+import NandK.CookABook.entity.Author;
 
 @Repository
-public interface CategoryRepository extends JpaRepository<Category, Long>, JpaSpecificationExecutor<Category> {
-    public Category findByName(String name);
+public interface AuthorRepository extends JpaRepository<Author, Long>, JpaSpecificationExecutor<Author> {
+    public Author findByName(String name);
 
     public boolean existsByName(String name);
 
-    public List<Category> findByIdIn(List<Long> ids);
 }

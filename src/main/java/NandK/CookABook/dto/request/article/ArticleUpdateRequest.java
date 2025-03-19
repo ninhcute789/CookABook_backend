@@ -1,16 +1,16 @@
-package NandK.CookABook.dto.request;
+package NandK.CookABook.dto.request.article;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class ArticleCreationRequest {
+public class ArticleUpdateRequest {
+    @NotNull(message = "Id không được để trống")
+    private Long id;
 
-    @NotBlank(message = "Tiêu đề không được để trống")
     private String title;
-
     private String content;
     private String imageURL;
     private User user;

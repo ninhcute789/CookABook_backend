@@ -9,12 +9,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.request.UserCreationRequest;
-import NandK.CookABook.dto.request.UserUpdateRequest;
+import NandK.CookABook.dto.request.user.UserCreationRequest;
+import NandK.CookABook.dto.request.user.UserUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
-import NandK.CookABook.dto.response.UserCreationResponse;
-import NandK.CookABook.dto.response.UserFoundResponse;
-import NandK.CookABook.dto.response.UserUpdateResponse;
+import NandK.CookABook.dto.response.user.UserCreationResponse;
+import NandK.CookABook.dto.response.user.UserFoundResponse;
+import NandK.CookABook.dto.response.user.UserUpdateResponse;
 import NandK.CookABook.entity.Article;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.repository.ArticleRepository;
@@ -70,8 +70,15 @@ public class UserService {
         response.setGender(user.getGender());
         response.setDob(user.getDob());
         response.setEmail(user.getEmail());
+        response.setAvatar(user.getAvatar());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
+        if (user.getArticles() != null) {
+            List<UserFoundResponse.Article> articles = user.getArticles().stream().map(
+                    item -> new UserFoundResponse.Article(item.getId()))
+                    .collect(Collectors.toList());
+            response.setArticles(articles);
+        }
         return response;
     }
 
@@ -82,6 +89,7 @@ public class UserService {
         response.setGender(user.getGender());
         response.setDob(user.getDob());
         response.setEmail(user.getEmail());
+        response.setAvatar(user.getAvatar());
         response.setUpdatedAt(user.getUpdatedAt());
         return response;
     }
@@ -92,10 +100,10 @@ public class UserService {
         ResultPagination.Meta meta = new ResultPagination.Meta();
         // lay thong tin ve trang hien tai thong qua pageable tu client gui len
         meta.setPage(pageable.getPageNumber() + 1);
-        meta.setPageSize(pageable.getPageSize());
+        meta.setSize(pageable.getPageSize());
         // lay tong so trang va tong so phan tu tu database
-        meta.setTotalPage(users.getTotalPages());
-        meta.setTotalElement(users.getTotalElements());
+        meta.setTotalPages(users.getTotalPages());
+        meta.setTotalElements(users.getTotalElements());
         // set thong tin tra ra client
         result.setMeta(meta);
         // loai bo thong tin nhay cam
@@ -107,8 +115,12 @@ public class UserService {
                         item.getGender(),
                         item.getDob(),
                         item.getEmail(),
+                        item.getAvatar(),
                         item.getCreatedAt(),
-                        item.getUpdatedAt()))
+                        item.getUpdatedAt(),
+                        item.getArticles() != null ? item.getArticles().stream().map(
+                                article -> new UserFoundResponse.Article(article.getId()))
+                                .collect(Collectors.toList()) : null))
                 .collect(Collectors.toList());
         result.setData(listUser);
         return result;
@@ -132,7 +144,7 @@ public class UserService {
         }
     }
 
-    public User updateUserById(UserUpdateRequest request) {
+    public User updateUser(UserUpdateRequest request) {
         User user = this.getUserById(request.getId());
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
             user.setPassword(request.getPassword());
@@ -149,12 +161,14 @@ public class UserService {
         if (request.getEmail() != null && !request.getEmail().isBlank()) {
             user.setEmail(request.getEmail());
         }
+        if (request.getAvatar() != null && !request.getAvatar().isBlank()) {
+            user.setAvatar(request.getAvatar());
+        }
         return this.userRepository.save(user);
     }
 
     public void deleteUserById(Long userId) {
-        User user = this.getUserById(userId);
-        List<Article> articles = this.articleRepository.findByUser(user);
+        List<Article> articles = this.articleRepository.findByUserId(userId);
         this.articleRepository.deleteAll(articles);
         this.userRepository.deleteById(userId);
     }

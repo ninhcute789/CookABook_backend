@@ -4,12 +4,12 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
-import NandK.CookABook.dto.request.UserCreationRequest;
-import NandK.CookABook.dto.request.UserUpdateRequest;
+import NandK.CookABook.dto.request.user.UserCreationRequest;
+import NandK.CookABook.dto.request.user.UserUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
-import NandK.CookABook.dto.response.UserCreationResponse;
-import NandK.CookABook.dto.response.UserFoundResponse;
-import NandK.CookABook.dto.response.UserUpdateResponse;
+import NandK.CookABook.dto.response.user.UserCreationResponse;
+import NandK.CookABook.dto.response.user.UserFoundResponse;
+import NandK.CookABook.dto.response.user.UserUpdateResponse;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.UserService;
@@ -57,6 +57,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToUserCreationResponse(user));
     }
 
+    @PostMapping("/register")
+    @ApiMessage("Đăng ký tài khoản thành công")
+    public ResponseEntity<UserCreationResponse> register(@Valid @RequestBody UserCreationRequest request)
+            throws IdInvalidException {
+        boolean isUserNameExist = this.userService.isUsernameExist(request.getUsername());
+        if (isUserNameExist) {
+            throw new IdInvalidException(
+                    "Username " + request.getUsername() + " đã tồn tại, vui lòng sử dụng username khác");
+        }
+        String hashPassword = this.passwordEncoder.encode(request.getPassword()); // ham encode tra ra String
+        request.setPassword(hashPassword);
+        User user = this.userService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToUserCreationResponse(user));
+    }
+
     @GetMapping
     @ApiMessage("Lấy danh sách người dùng thành công")
     public ResponseEntity<ResultPagination> getAllUsers(
@@ -76,7 +91,7 @@ public class UserController {
 
     @PutMapping
     @ApiMessage("Cập nhật người dùng thành công")
-    public ResponseEntity<UserUpdateResponse> updateUserById(@Valid @RequestBody UserUpdateRequest request)
+    public ResponseEntity<UserUpdateResponse> updateUser(@Valid @RequestBody UserUpdateRequest request)
             throws IdInvalidException {
         User user = this.userService.getUserById(request.getId());
         if (user == null) {
@@ -86,7 +101,7 @@ public class UserController {
             String hashPassword = this.passwordEncoder.encode(request.getPassword());
             request.setPassword(hashPassword);
         }
-        user = this.userService.updateUserById(request);
+        user = this.userService.updateUser(request);
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserUpdateResponse(user));
     }
 
