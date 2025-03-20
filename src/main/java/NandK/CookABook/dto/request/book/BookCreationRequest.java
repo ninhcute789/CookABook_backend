@@ -36,10 +36,13 @@ public class BookCreationRequest {
     private Double discountPercentage;
 
     @NotNull(message = "Số lượng không được để trống")
-    private Long stockQuantity;
+    private Integer stockQuantity;
 
-    @NotNull(message = "Trạng thái không được để trống")
+    @NotNull(message = "Trạng thái hàng không được để trống")
     private Boolean available;
+
+    @NotNull(message = "Trạng thái chính hãng không được để trống")
+    private Boolean official;
     // private Long sold;
     private String description;
     private CoverTypeEnum coverType;

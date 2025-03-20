@@ -20,9 +20,13 @@ import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.dto.response.book.BookCreationResponse;
 import NandK.CookABook.dto.response.book.BookFoundResponse;
 import NandK.CookABook.dto.response.book.BookUpdateResponse;
+import NandK.CookABook.entity.Author;
 import NandK.CookABook.entity.Book;
+import NandK.CookABook.entity.Category;
 import NandK.CookABook.exception.IdInvalidException;
+import NandK.CookABook.service.AuthorService;
 import NandK.CookABook.service.BookService;
+import NandK.CookABook.service.CategoryService;
 import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
 
@@ -32,7 +36,13 @@ public class BookController {
 
     private final BookService bookService;
 
-    public BookController(BookService bookService) {
+    private final CategoryService categoryService;
+
+    private final AuthorService authorService;
+
+    public BookController(BookService bookService, CategoryService categoryService, AuthorService authorService) {
+        this.authorService = authorService;
+        this.categoryService = categoryService;
         this.bookService = bookService;
     }
 
@@ -47,6 +57,36 @@ public class BookController {
     @ApiMessage("Lấy danh sách sách thành công")
     public ResponseEntity<ResultPagination> getAllBooks(@Filter Specification<Book> spec, Pageable pageable) {
         return ResponseEntity.ok(this.bookService.getAllBooks(spec, pageable));
+    }
+
+    @GetMapping("/preview")
+    @ApiMessage("Lấy danh sách sách theo trang thành công")
+    public ResponseEntity<ResultPagination> getBooksPreview(@Filter Specification<Book> spec, Pageable pageable) {
+        return ResponseEntity.ok(this.bookService.getBooksPreview(spec, pageable));
+    }
+
+    @GetMapping("/all-by-author/{authorId}")
+    @ApiMessage("Lấy danh sách sách theo tác giả thành công")
+    public ResponseEntity<ResultPagination> getAllBooksByAuthor(
+            @PathVariable Long authorId, Pageable pageable)
+            throws IdInvalidException {
+        Author author = this.authorService.getAuthorById(authorId);
+        if (author == null) {
+            throw new IdInvalidException("Không tìm thấy tác giả với id: " + authorId);
+        }
+        return ResponseEntity.ok(this.bookService.getAllBooksByAuthor(authorId, pageable));
+    }
+
+    @GetMapping("/all-by-category/{categoryId}")
+    @ApiMessage("Lấy danh sách sách theo danh mục thành công")
+    public ResponseEntity<ResultPagination> getAllBooksByCategory(
+            @PathVariable Long categoryId, Pageable pageable)
+            throws IdInvalidException {
+        Category category = this.categoryService.getCategoryById(categoryId);
+        if (category == null) {
+            throw new IdInvalidException("Không tìm thấy danh mục với id: " + categoryId);
+        }
+        return ResponseEntity.ok(this.bookService.getAllBooksByCategory(categoryId, pageable));
     }
 
     @GetMapping("/{bookId}")

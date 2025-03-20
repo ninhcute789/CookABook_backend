@@ -15,6 +15,7 @@ import NandK.CookABook.dto.request.book.BookUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.dto.response.book.BookCreationResponse;
 import NandK.CookABook.dto.response.book.BookFoundResponse;
+import NandK.CookABook.dto.response.book.BookPreviewResponse;
 import NandK.CookABook.dto.response.book.BookUpdateResponse;
 import NandK.CookABook.entity.Author;
 import NandK.CookABook.entity.Book;
@@ -81,6 +82,7 @@ public class BookService {
                         (book.getOriginalPrice() * book.getDiscountPercentage() / 100)));
         book.setStockQuantity(request.getStockQuantity());
         book.setAvailable(request.getAvailable());
+        book.setOfficial(request.getOfficial());
         book.setDescription(request.getDescription());
         book.setCoverType(request.getCoverType());
 
@@ -105,6 +107,7 @@ public class BookService {
         response.setDiscountPrice(book.getDiscountPrice());
         response.setStockQuantity(book.getStockQuantity());
         response.setAvailable(book.getAvailable());
+        response.setOfficial(book.getOfficial());
         response.setDescription(book.getDescription());
         response.setCoverType(book.getCoverType());
         if (book.getAuthor() != null) {
@@ -150,6 +153,7 @@ public class BookService {
                         item.getDiscountPrice(),
                         item.getStockQuantity(),
                         item.getAvailable(),
+                        item.getOfficial(),
                         item.getDescription(),
                         item.getCoverType(),
                         item.getCreatedAt(),
@@ -163,6 +167,72 @@ public class BookService {
                                         category.getName()))
                                 .collect(Collectors.toList()) : null))
                 .collect(Collectors.toList());
+        result.setData(listBooks);
+        return result;
+    }
+
+    public List<BookPreviewResponse> convertToBookPreviewResponses(List<Book> books) {
+        return books.stream().map(
+                item -> new BookPreviewResponse(
+                        item.getId(),
+                        item.getTitle(),
+                        item.getAuthor() != null ? item.getAuthor().getName() : null,
+                        item.getImageURL(),
+                        item.getOriginalPrice(),
+                        item.getDiscountPercentage(),
+                        item.getDiscountPrice(),
+                        item.getAvailable(),
+                        item.getOfficial()))
+                .collect(Collectors.toList());
+    }
+
+    public ResultPagination getBooksPreview(Specification<Book> spec, Pageable pageable) {
+        Page<Book> books = this.bookRepository.findAll(spec, pageable);
+        ResultPagination result = new ResultPagination();
+        ResultPagination.Meta meta = new ResultPagination.Meta();
+
+        meta.setPage(pageable.getPageNumber() + 1);
+        meta.setSize(pageable.getPageSize());
+        meta.setTotalPages(books.getTotalPages());
+        meta.setTotalElements(books.getTotalElements());
+
+        result.setMeta(meta);
+
+        List<BookPreviewResponse> listBooks = this.convertToBookPreviewResponses(books.getContent());
+        result.setData(listBooks);
+        return result;
+    }
+
+    public ResultPagination getAllBooksByCategory(Long categoryId, Pageable pageable) {
+        Page<Book> books = this.bookRepository.findByCategories_Id(categoryId, pageable);
+        ResultPagination result = new ResultPagination();
+        ResultPagination.Meta meta = new ResultPagination.Meta();
+
+        meta.setPage(pageable.getPageNumber() + 1);
+        meta.setSize(pageable.getPageSize());
+        meta.setTotalPages(books.getTotalPages());
+        meta.setTotalElements(books.getTotalElements());
+
+        result.setMeta(meta);
+
+        List<BookPreviewResponse> listBooks = this.convertToBookPreviewResponses(books.getContent());
+        result.setData(listBooks);
+        return result;
+    }
+
+    public ResultPagination getAllBooksByAuthor(Long authorId, Pageable pageable) {
+        Page<Book> books = this.bookRepository.findByAuthorId(authorId, pageable);
+        ResultPagination result = new ResultPagination();
+        ResultPagination.Meta meta = new ResultPagination.Meta();
+
+        meta.setPage(pageable.getPageNumber() + 1);
+        meta.setSize(pageable.getPageSize());
+        meta.setTotalPages(books.getTotalPages());
+        meta.setTotalElements(books.getTotalElements());
+
+        result.setMeta(meta);
+
+        List<BookPreviewResponse> listBooks = this.convertToBookPreviewResponses(books.getContent());
         result.setData(listBooks);
         return result;
     }

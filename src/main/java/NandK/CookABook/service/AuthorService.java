@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import NandK.CookABook.dto.request.author.AuthorCreationRequest;
 import NandK.CookABook.dto.request.author.AuthorUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.author.AuthorCreationResponse;
 import NandK.CookABook.dto.response.author.AuthorFoundResponse;
+import NandK.CookABook.dto.response.author.AuthorUpdateResponse;
 import NandK.CookABook.entity.Author;
 import NandK.CookABook.entity.Book;
 import NandK.CookABook.repository.AuthorRepository;
@@ -37,13 +39,23 @@ public class AuthorService {
         Author author = new Author();
 
         author.setName(request.getName());
-        author.setNumberOfBooks(0);
 
         return this.authorRepository.save(author);
     }
 
+    public AuthorCreationResponse convertToAuthorCreationResponse(Author author) {
+        AuthorCreationResponse authorCreationResponse = new AuthorCreationResponse();
+        authorCreationResponse.setId(author.getId());
+        authorCreationResponse.setName(author.getName());
+        authorCreationResponse.setCreatedAt(author.getCreatedAt());
+        return authorCreationResponse;
+    }
+
     public Integer getNumberOfBooksByAuthorId(Long authorId) {
-        return bookRepository.countByAuthorId(authorId);
+        Author author = this.getAuthorById(authorId);
+        Integer numberOfBooks = bookRepository.countByAuthorId(authorId);
+        author.setNumberOfBooks(numberOfBooks);
+        return numberOfBooks;
     }
 
     public ResultPagination getAllAuthors(Specification<Author> spec, Pageable pageable) {
@@ -64,6 +76,7 @@ public class AuthorService {
             authorFoundResponse.setId(author.getId());
             authorFoundResponse.setName(author.getName());
             authorFoundResponse.setNumberOfBooks(this.getNumberOfBooksByAuthorId(author.getId()));
+            authorFoundResponse.setBookIds(this.getBookIdsByAuthor(author));
             authorFoundResponse.setCreatedAt(author.getCreatedAt());
             authorFoundResponse.setUpdatedAt(author.getUpdatedAt());
             listAuthors.add(authorFoundResponse);
@@ -75,11 +88,29 @@ public class AuthorService {
     public Author getAuthorById(Long authorId) {
         Optional<Author> author = this.authorRepository.findById(authorId);
         if (author.isPresent()) {
-            author.get().setNumberOfBooks(this.getNumberOfBooksByAuthorId(authorId));
             return author.get();
         } else {
             return null;
         }
+    }
+
+    public List<String> getBookIdsByAuthor(Author author) {
+        List<String> bookIds = new ArrayList<>();
+        for (Book book : author.getBooks()) {
+            bookIds.add(book.getId().toString());
+        }
+        return bookIds;
+    }
+
+    public AuthorFoundResponse convertToAuthorFindByIdResponse(Author author) {
+        AuthorFoundResponse authorFoundResponse = new AuthorFoundResponse();
+        authorFoundResponse.setId(author.getId());
+        authorFoundResponse.setName(author.getName());
+        authorFoundResponse.setNumberOfBooks(this.getNumberOfBooksByAuthorId(author.getId()));
+        authorFoundResponse.setBookIds(this.getBookIdsByAuthor(author));
+        authorFoundResponse.setCreatedAt(author.getCreatedAt());
+        authorFoundResponse.setUpdatedAt(author.getUpdatedAt());
+        return authorFoundResponse;
     }
 
     public Author updateAuthor(AuthorUpdateRequest request) {
@@ -88,6 +119,14 @@ public class AuthorService {
             author.setName(request.getName());
         }
         return this.authorRepository.save(author);
+    }
+
+    public AuthorUpdateResponse convertToAuthorUpdateResponse(Author author) {
+        AuthorUpdateResponse authorUpdateResponse = new AuthorUpdateResponse();
+        authorUpdateResponse.setId(author.getId());
+        authorUpdateResponse.setName(author.getName());
+        authorUpdateResponse.setUpdatedAt(author.getUpdatedAt());
+        return authorUpdateResponse;
     }
 
     public void deleteAuthorById(Long authorId) {
