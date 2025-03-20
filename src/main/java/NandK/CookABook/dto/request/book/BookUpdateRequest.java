@@ -32,8 +32,9 @@ public class BookUpdateRequest {
     @DecimalMax(value = "100.0", message = "Phần trăm giảm không được lớn hơn 100")
     private Double discountPercentage;
 
-    private Long stockQuantity;
+    private Integer stockQuantity;
     private Boolean available;
+    private Boolean official;
     private String description;
     private CoverTypeEnum coverType;
     private Author author;

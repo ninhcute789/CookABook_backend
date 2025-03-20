@@ -26,8 +26,10 @@ public class BookUpdateResponse {
     private Integer originalPrice;
     private Double discountPercentage;
     private Integer discountPrice;
-    private Long stockQuantity;
+    private Integer stockQuantity;
     private Boolean available;
+    private Boolean official;
+    // private Integer sold;
     private String description;
     private CoverTypeEnum coverType;
 
