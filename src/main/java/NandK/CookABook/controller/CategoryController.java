@@ -8,6 +8,8 @@ import com.turkraft.springfilter.boot.Filter;
 import NandK.CookABook.dto.request.category.CategoryCreationRequest;
 import NandK.CookABook.dto.request.category.CategoryUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.category.CategoryCreationResponse;
+import NandK.CookABook.dto.response.category.CategoryUpdateResponse;
 import NandK.CookABook.entity.Category;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.CategoryService;
@@ -36,14 +38,16 @@ public class CategoryController {
 
     @PostMapping
     @ApiMessage("Tạo danh mục thành công")
-    public ResponseEntity<Category> createCategory(@Valid @RequestBody CategoryCreationRequest request)
+    public ResponseEntity<CategoryCreationResponse> createCategory(
+            @Valid @RequestBody CategoryCreationRequest request)
             throws IdInvalidException {
         boolean isCategoryNameExist = this.categoryService.isCategoryNameExist(request.getName());
         if (isCategoryNameExist) {
             throw new IdInvalidException(
                     "Danh mục với tên = " + request.getName() + " đã tồn tại, vui lòng sử dụng tên khác");
         }
-        return ResponseEntity.ok(this.categoryService.createCategory(request));
+        Category category = this.categoryService.createCategory(request);
+        return ResponseEntity.ok(this.categoryService.convertToCategoryCreationResponse(category));
     }
 
     @GetMapping("/all")
@@ -66,7 +70,8 @@ public class CategoryController {
 
     @PutMapping
     @ApiMessage("Cập nhật danh mục thành công")
-    public ResponseEntity<Category> updateCategory(@Valid @RequestBody CategoryUpdateRequest request)
+    public ResponseEntity<CategoryUpdateResponse> updateCategory(
+            @Valid @RequestBody CategoryUpdateRequest request)
             throws IdInvalidException {
         Category category = this.categoryService.getCategoryById(request.getId());
         if (category == null) {
@@ -78,7 +83,7 @@ public class CategoryController {
                     "Danh mục với tên = " + request.getName() + " đã tồn tại, vui lòng sử dụng tên khác");
         }
         category = this.categoryService.updateCategory(request);
-        return ResponseEntity.ok(category);
+        return ResponseEntity.ok(this.categoryService.convertToCategoryUpdateResponse(category));
     }
 
     @DeleteMapping("/{categoryId}")

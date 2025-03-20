@@ -17,6 +17,9 @@ import com.turkraft.springfilter.boot.Filter;
 import NandK.CookABook.dto.request.author.AuthorCreationRequest;
 import NandK.CookABook.dto.request.author.AuthorUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.author.AuthorCreationResponse;
+import NandK.CookABook.dto.response.author.AuthorFoundResponse;
+import NandK.CookABook.dto.response.author.AuthorUpdateResponse;
 import NandK.CookABook.entity.Author;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.AuthorService;
@@ -34,14 +37,16 @@ public class AuthorController {
 
     @PostMapping
     @ApiMessage("Tạo tác giả thành công")
-    public ResponseEntity<Author> createAuthor(@Valid @RequestBody AuthorCreationRequest request)
+    public ResponseEntity<AuthorCreationResponse> createAuthor(
+            @Valid @RequestBody AuthorCreationRequest request)
             throws IdInvalidException {
         boolean isAuthorNameExist = this.authorService.isAuthorNameExist(request.getName());
         if (isAuthorNameExist) {
             throw new IdInvalidException(
                     "Tác giả với tên = " + request.getName() + " đã tồn tại, vui lòng sử dụng tên khác");
         }
-        return ResponseEntity.ok(this.authorService.createAuthor(request));
+        Author author = this.authorService.createAuthor(request);
+        return ResponseEntity.ok(this.authorService.convertToAuthorCreationResponse(author));
     }
 
     @GetMapping
@@ -53,18 +58,18 @@ public class AuthorController {
 
     @GetMapping("/{authorId}")
     @ApiMessage("Lấy tác giả thành công")
-    public ResponseEntity<Author> getAuthorById(@Valid @PathVariable Long authorId)
+    public ResponseEntity<AuthorFoundResponse> getAuthorById(@Valid @PathVariable Long authorId)
             throws IdInvalidException {
         Author author = this.authorService.getAuthorById(authorId);
         if (author == null) {
             throw new IdInvalidException("Tác giả với id = " + authorId + " không tồn tại");
         }
-        return ResponseEntity.ok(author);
+        return ResponseEntity.ok(this.authorService.convertToAuthorFindByIdResponse(author));
     }
 
     @PutMapping
     @ApiMessage("Cập nhật tác giả thành công")
-    public ResponseEntity<Author> updateAuthor(@Valid @RequestBody AuthorUpdateRequest request)
+    public ResponseEntity<AuthorUpdateResponse> updateAuthor(@Valid @RequestBody AuthorUpdateRequest request)
             throws IdInvalidException {
         Author author = this.authorService.getAuthorById(request.getId());
         if (author == null) {
@@ -76,7 +81,7 @@ public class AuthorController {
                     "Tác giả với tên = " + request.getName() + " đã tồn tại, vui lòng sử dụng tên khác");
         }
         author = this.authorService.updateAuthor(request);
-        return ResponseEntity.ok(author);
+        return ResponseEntity.ok(this.authorService.convertToAuthorUpdateResponse(author));
     }
 
     @DeleteMapping("/{authorId}")

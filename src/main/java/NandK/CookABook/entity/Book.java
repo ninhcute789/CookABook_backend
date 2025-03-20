@@ -43,11 +43,12 @@ public class Book {
     private Integer originalPrice;
     private Double discountPercentage;
     private Integer discountPrice;
-    private Long stockQuantity;
+    private Integer stockQuantity;
     private Boolean available;
+    private Boolean official;
+    // private Integer sold;
     // private Double rating;
     // private Long ratingCount;
-    // private Long sold;
 
     @Column(columnDefinition = "MEDIUMTEXT")
     private String description;

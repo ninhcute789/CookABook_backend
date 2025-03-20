@@ -1,7 +1,9 @@
 package NandK.CookABook.service;
 
+import NandK.CookABook.entity.Book;
 import NandK.CookABook.entity.Category;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -14,7 +16,9 @@ import org.springframework.stereotype.Service;
 import NandK.CookABook.dto.request.category.CategoryCreationRequest;
 import NandK.CookABook.dto.request.category.CategoryUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.category.CategoryCreationResponse;
 import NandK.CookABook.dto.response.category.CategoryFoundResponse;
+import NandK.CookABook.dto.response.category.CategoryUpdateResponse;
 import NandK.CookABook.repository.CategoryRepository;
 
 @Service
@@ -38,6 +42,22 @@ public class CategoryService {
         return this.categoryRepository.save(category);
     }
 
+    public CategoryCreationResponse convertToCategoryCreationResponse(Category category) {
+        CategoryCreationResponse categoryCreationResponse = new CategoryCreationResponse();
+        categoryCreationResponse.setId(category.getId());
+        categoryCreationResponse.setName(category.getName());
+        categoryCreationResponse.setCreatedAt(category.getCreatedAt());
+        return categoryCreationResponse;
+    }
+
+    public List<String> getBookIdsByCategory(Category category) {
+        List<String> bookIds = new ArrayList<>();
+        for (Book book : category.getBooks()) {
+            bookIds.add(book.getId().toString());
+        }
+        return bookIds;
+    }
+
     public ResultPagination getAllCategories(Specification<Category> spec, Pageable pageable) {
         Page<Category> categories = this.categoryRepository.findAll(spec, pageable);
         ResultPagination result = new ResultPagination();
@@ -55,7 +75,8 @@ public class CategoryService {
                         item.getId(),
                         item.getName(),
                         item.getCreatedAt(),
-                        item.getUpdatedAt()))
+                        item.getUpdatedAt(),
+                        this.getBookIdsByCategory(item)))
                 .collect(Collectors.toList());
         result.setData(listCategories);
         return result;
@@ -80,6 +101,14 @@ public class CategoryService {
         } else {
             return null;
         }
+    }
+
+    public CategoryUpdateResponse convertToCategoryUpdateResponse(Category category) {
+        CategoryUpdateResponse categoryUpdateResponse = new CategoryUpdateResponse();
+        categoryUpdateResponse.setId(category.getId());
+        categoryUpdateResponse.setName(category.getName());
+        categoryUpdateResponse.setUpdatedAt(category.getUpdatedAt());
+        return categoryUpdateResponse;
     }
 
     public void deleteCategoryById(Long categoryId) {
