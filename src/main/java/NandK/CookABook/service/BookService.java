@@ -1,5 +1,6 @@
 package NandK.CookABook.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -46,7 +47,8 @@ public class BookService {
     public Book createBook(BookCreationRequest request) {
         Book book = new Book();
         // check author
-        if (request.getAuthor() != null && request.getAuthor().getName() != null) {
+        if (request.getAuthor() != null && request.getAuthor().getName() != null
+                && !request.getAuthor().getName().isEmpty()) {
             Author author = this.authorRepository.findByName(request.getAuthor().getName());
             if (author == null) {
                 AuthorCreationRequest requestAuthor = new AuthorCreationRequest(request.getAuthor().getName());
@@ -59,11 +61,16 @@ public class BookService {
             book.setAuthor(null);
         }
         // check category
-        if (request.getCategories() != null) {
+        if (request.getCategories() != null && !request.getCategories().isEmpty()) {
             List<Long> categoryIds = request.getCategories().stream().map(category -> category.getId())
                     .collect(Collectors.toList());
             List<Category> categories = this.categoryRepository.findByIdIn(categoryIds);
-            book.setCategories(categories);
+            if (!categories.isEmpty()) {
+                book.setCategories(categories);
+            } else {
+                // Handle the case when no categories are found
+                book.setCategories(Collections.emptyList());
+            }
         } else {
             book.setCategories(null);
         }
@@ -115,7 +122,7 @@ public class BookService {
             author.setName(book.getAuthor().getName());
             response.setAuthor(author);
         }
-        if (book.getCategories() != null) {
+        if (book.getCategories() != null && !book.getCategories().isEmpty()) {
             List<BookCreationResponse.Category> categories = book.getCategories().stream().map(
                     item -> new BookCreationResponse.Category(item.getId(), item.getName()))
                     .collect(Collectors.toList());
@@ -158,14 +165,17 @@ public class BookService {
                         item.getCoverType(),
                         item.getCreatedAt(),
                         item.getUpdatedAt(),
-                        item.getAuthor() != null ? new BookFoundResponse.Author(
-                                item.getAuthor().getId(),
-                                item.getAuthor().getName()) : null,
-                        item.getCategories() != null ? item.getCategories().stream().map(
-                                category -> new BookFoundResponse.Category(
-                                        category.getId(),
-                                        category.getName()))
-                                .collect(Collectors.toList()) : null))
+                        // Dùng Optional để tránh NullPointerException cho Author
+                        Optional.ofNullable(item.getAuthor())
+                                .map(author -> new BookFoundResponse.Author(author.getId(), author.getName()))
+                                .orElse(null),
+                        // Dùng kiểm tra null hoặc rỗng với category list
+                        Optional.ofNullable(item.getCategories())
+                                .map(categories -> categories.stream()
+                                        .map(category -> new BookFoundResponse.Category(category.getId(),
+                                                category.getName()))
+                                        .collect(Collectors.toList()))
+                                .orElse(Collections.emptyList())))
                 .collect(Collectors.toList());
         result.setData(listBooks);
         return result;
@@ -176,7 +186,9 @@ public class BookService {
                 item -> new BookPreviewResponse(
                         item.getId(),
                         item.getTitle(),
-                        item.getAuthor() != null ? item.getAuthor().getName() : null,
+                        Optional.ofNullable(item.getAuthor())
+                                .map(author -> author.getName())
+                                .orElse(null),
                         item.getImageURL(),
                         item.getOriginalPrice(),
                         item.getDiscountPercentage(),
@@ -273,7 +285,7 @@ public class BookService {
             author.setName(book.getAuthor().getName());
             response.setAuthor(author);
         }
-        if (book.getCategories() != null) {
+        if (book.getCategories() != null && !book.getCategories().isEmpty()) {
             List<BookFoundResponse.Category> categories = book.getCategories().stream().map(
                     item -> new BookFoundResponse.Category(item.getId(), item.getName()))
                     .collect(Collectors.toList());
@@ -286,7 +298,8 @@ public class BookService {
         Book book = this.getBookById(request.getId());
         if (book != null) {
             // check author
-            if (request.getAuthor() != null && request.getAuthor().getName() != null) {
+            if (request.getAuthor() != null && request.getAuthor().getName() != null
+                    && !request.getAuthor().getName().isEmpty()) {
                 Author author = this.authorRepository.findByName(request.getAuthor().getName());
                 if (author == null) {
                     AuthorCreationRequest requestAuthor = new AuthorCreationRequest(request.getAuthor().getName());
@@ -299,11 +312,16 @@ public class BookService {
                 book.setAuthor(null);
             }
             // check category
-            if (request.getCategories() != null) {
+            if (request.getCategories() != null && !request.getCategories().isEmpty()) {
                 List<Long> categoryIds = request.getCategories().stream().map(category -> category.getId())
                         .collect(Collectors.toList());
                 List<Category> categories = this.categoryRepository.findByIdIn(categoryIds);
-                book.setCategories(categories);
+                if (!categories.isEmpty()) {
+                    book.setCategories(categories);
+                } else {
+                    // Handle the case when no categories are found
+                    book.setCategories(Collections.emptyList());
+                }
             } else {
                 book.setCategories(null);
             }
@@ -388,7 +406,7 @@ public class BookService {
             author.setName(book.getAuthor().getName());
             response.setAuthor(author);
         }
-        if (book.getCategories() != null) {
+        if (book.getCategories() != null && !book.getCategories().isEmpty()) {
             List<BookUpdateResponse.Category> categories = book.getCategories().stream().map(
                     item -> new BookUpdateResponse.Category(item.getId(), item.getName()))
                     .collect(Collectors.toList());
