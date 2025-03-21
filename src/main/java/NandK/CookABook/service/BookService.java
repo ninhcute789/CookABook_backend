@@ -276,6 +276,7 @@ public class BookService {
         response.setDiscountPrice(book.getDiscountPrice());
         response.setStockQuantity(book.getStockQuantity());
         response.setAvailable(book.getAvailable());
+        response.setOfficial(book.getOfficial());
         response.setDescription(book.getDescription());
         response.setCoverType(book.getCoverType());
         response.setCreatedAt(book.getCreatedAt());
@@ -401,6 +402,7 @@ public class BookService {
         response.setDiscountPrice(book.getDiscountPrice());
         response.setStockQuantity(book.getStockQuantity());
         response.setAvailable(book.getAvailable());
+        response.setOfficial(book.getOfficial());
         response.setDescription(book.getDescription());
         response.setCoverType(book.getCoverType());
         response.setUpdatedAt(book.getUpdatedAt());
