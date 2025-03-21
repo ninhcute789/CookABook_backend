@@ -368,6 +368,9 @@ public class BookService {
             if (request.getAvailable() != null) {
                 book.setAvailable(request.getAvailable());
             }
+            if (request.getOfficial() != null) {
+                book.setOfficial(request.getOfficial());
+            }
             if (request.getDescription() != null && !request.getDescription().isBlank()) {
                 book.setDescription(request.getDescription());
             }
