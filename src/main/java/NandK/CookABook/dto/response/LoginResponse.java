@@ -20,6 +20,7 @@ public class LoginResponse {
         private Long id;
         private String username;
         private String name;
+        private Long cartId;
     }
 
     @Getter

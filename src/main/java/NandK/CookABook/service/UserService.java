@@ -27,9 +27,12 @@ public class UserService {
 
     private final ArticleRepository articleRepository;
 
-    public UserService(UserRepository userRepository, ArticleRepository articleRepository) {
+    private final CartService cartService;
+
+    public UserService(UserRepository userRepository, ArticleRepository articleRepository, CartService cartService) {
         this.userRepository = userRepository;
         this.articleRepository = articleRepository;
+        this.cartService = cartService;
     }
 
     public boolean isUsernameExist(String username) {
@@ -45,7 +48,7 @@ public class UserService {
         user.setGender(request.getGender());
         user.setDob(request.getDob());
         user.setEmail(request.getEmail());
-
+        user.setCart(this.cartService.createCart(user));
         return this.userRepository.save(user);
 
     }

@@ -9,6 +9,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import NandK.CookABook.utils.SecurityUtil;
 import NandK.CookABook.utils.constant.GenderEnum;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -16,6 +17,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -60,6 +62,9 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     @JsonIgnore // de tranh lap vo han
     private List<Article> articles;
+
+    @OneToOne(mappedBy = "user", cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
+    private Cart cart;
 
     @PrePersist
     public void beforeCreate() {

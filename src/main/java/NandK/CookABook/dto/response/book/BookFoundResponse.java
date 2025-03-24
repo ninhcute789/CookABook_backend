@@ -27,7 +27,7 @@ public class BookFoundResponse {
     private String imageURL;
     private Integer originalPrice;
     private Double discountPercentage;
-    private Integer discountPrice;
+    private Integer finalPrice;
     private Integer stockQuantity;
     private Boolean available;
     private Boolean official;
