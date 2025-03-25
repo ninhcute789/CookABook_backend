@@ -9,6 +9,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +20,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import NandK.CookABook.dto.request.ForgotPasswordRequest;
+import NandK.CookABook.dto.request.user.UserCreationRequest;
 import NandK.CookABook.dto.request.user.UserLoginRequest;
 import NandK.CookABook.dto.response.LoginResponse;
+import NandK.CookABook.dto.response.user.UserCreationResponse;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.UserService;
@@ -35,16 +38,34 @@ public class AuthController {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final SecurityUtil securityUtil;
     private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
     @Value("${cookabook.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
 
     private AuthController(
             AuthenticationManagerBuilder authenticationManagerBuilder,
             SecurityUtil securityUtil,
-            UserService userService) {
+            UserService userService,
+            PasswordEncoder passwordEncoder) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userService = userService;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @PostMapping("/register")
+    @ApiMessage("Đăng ký tài khoản thành công")
+    public ResponseEntity<UserCreationResponse> register(@Valid @RequestBody UserCreationRequest request)
+            throws IdInvalidException {
+        boolean isUserNameExist = this.userService.isUsernameExist(request.getUsername());
+        if (isUserNameExist) {
+            throw new IdInvalidException(
+                    "Username " + request.getUsername() + " đã tồn tại, vui lòng sử dụng username khác");
+        }
+        String hashPassword = this.passwordEncoder.encode(request.getPassword()); // ham encode tra ra String
+        request.setPassword(hashPassword);
+        User user = this.userService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToUserCreationResponse(user));
     }
 
     @PostMapping("/login")
@@ -64,7 +85,8 @@ public class AuthController {
         User currentUser = this.userService.getUserByUsername(request.getUsername());
         if (currentUser != null) {
             LoginResponse.UserLoginInformation userLoginInformation = new LoginResponse.UserLoginInformation(
-                    currentUser.getId(), currentUser.getUsername(), currentUser.getName());
+                    currentUser.getId(), currentUser.getUsername(), currentUser.getName(),
+                    currentUser.getCart().getId());
             loginResponse.setUser(userLoginInformation);
         }
         // create access token
@@ -78,7 +100,6 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from("refresh-token", refreshToken)
                 .httpOnly(true)
-                .secure(true)
                 .path("/")
                 .maxAge(refreshTokenExpiration)
                 .build();
@@ -101,6 +122,7 @@ public class AuthController {
             loginResponse.setId(currentUser.getId());
             loginResponse.setUsername(currentUser.getUsername());
             loginResponse.setName(currentUser.getName());
+            loginResponse.setCartId(currentUser.getCart().getId());
             userGetAccount.setUser(loginResponse);
         }
         return ResponseEntity.status(HttpStatus.OK).body(userGetAccount);
@@ -129,7 +151,8 @@ public class AuthController {
         User currentUser = this.userService.getUserByUsername(username);
         if (currentUser != null) {
             LoginResponse.UserLoginInformation userLoginInformation = new LoginResponse.UserLoginInformation(
-                    currentUser.getId(), currentUser.getUsername(), currentUser.getName());
+                    currentUser.getId(), currentUser.getUsername(), currentUser.getName(),
+                    currentUser.getCart().getId());
             loginResponse.setUser(userLoginInformation);
         }
         // create access token
@@ -143,7 +166,6 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from("refresh-token", newRefreshToken)
                 .httpOnly(true)
-                .secure(true)
                 .path("/")
                 .maxAge(refreshTokenExpiration)
                 .build();
@@ -167,7 +189,6 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from("refresh-token", "")
                 .httpOnly(true)
-                .secure(true)
                 .path("/")
                 .maxAge(0)
                 .build();

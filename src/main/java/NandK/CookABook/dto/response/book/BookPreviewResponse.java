@@ -16,7 +16,7 @@ public class BookPreviewResponse {
     private String imageURL;
     private Integer originalPrice;
     private Double discountPercentage;
-    private Integer discountPrice;
+    private Integer finalPrice;
     private Boolean available;
     private Boolean official;
 }

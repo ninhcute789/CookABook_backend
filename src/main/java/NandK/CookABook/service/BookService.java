@@ -84,7 +84,7 @@ public class BookService {
         book.setImageURL(request.getImageURL());
         book.setOriginalPrice(request.getOriginalPrice());
         book.setDiscountPercentage(request.getDiscountPercentage());
-        book.setDiscountPrice((int) Math.round(
+        book.setFinalPrice((int) Math.round(
                 book.getOriginalPrice() -
                         (book.getOriginalPrice() * book.getDiscountPercentage() / 100)));
         book.setStockQuantity(request.getStockQuantity());
@@ -111,7 +111,7 @@ public class BookService {
         response.setImageURL(book.getImageURL());
         response.setOriginalPrice(book.getOriginalPrice());
         response.setDiscountPercentage(book.getDiscountPercentage());
-        response.setDiscountPrice(book.getDiscountPrice());
+        response.setFinalPrice(book.getFinalPrice());
         response.setStockQuantity(book.getStockQuantity());
         response.setAvailable(book.getAvailable());
         response.setOfficial(book.getOfficial());
@@ -157,7 +157,7 @@ public class BookService {
                         item.getImageURL(),
                         item.getOriginalPrice(),
                         item.getDiscountPercentage(),
-                        item.getDiscountPrice(),
+                        item.getFinalPrice(),
                         item.getStockQuantity(),
                         item.getAvailable(),
                         item.getOfficial(),
@@ -192,7 +192,7 @@ public class BookService {
                         item.getImageURL(),
                         item.getOriginalPrice(),
                         item.getDiscountPercentage(),
-                        item.getDiscountPrice(),
+                        item.getFinalPrice(),
                         item.getAvailable(),
                         item.getOfficial()))
                 .collect(Collectors.toList());
@@ -273,7 +273,7 @@ public class BookService {
         response.setImageURL(book.getImageURL());
         response.setOriginalPrice(book.getOriginalPrice());
         response.setDiscountPercentage(book.getDiscountPercentage());
-        response.setDiscountPrice(book.getDiscountPrice());
+        response.setFinalPrice(book.getFinalPrice());
         response.setStockQuantity(book.getStockQuantity());
         response.setAvailable(book.getAvailable());
         response.setOfficial(book.getOfficial());
@@ -357,11 +357,11 @@ public class BookService {
                 book.setDiscountPercentage(request.getDiscountPercentage());
             }
             if (request.getOriginalPrice() != null || request.getDiscountPercentage() != null) {
-                book.setDiscountPrice((int) Math.round(
+                book.setFinalPrice((int) Math.round(
                         book.getOriginalPrice() -
                                 (book.getOriginalPrice() * book.getDiscountPercentage() / 100)));
             } else if (request.getDiscountPercentage() == null) {
-                book.setDiscountPrice(null);
+                book.setFinalPrice(null);
             }
             if (request.getStockQuantity() != null) {
                 book.setStockQuantity(request.getStockQuantity());
@@ -399,7 +399,7 @@ public class BookService {
         response.setImageURL(book.getImageURL());
         response.setOriginalPrice(book.getOriginalPrice());
         response.setDiscountPercentage(book.getDiscountPercentage());
-        response.setDiscountPrice(book.getDiscountPrice());
+        response.setFinalPrice(book.getFinalPrice());
         response.setStockQuantity(book.getStockQuantity());
         response.setAvailable(book.getAvailable());
         response.setOfficial(book.getOfficial());
