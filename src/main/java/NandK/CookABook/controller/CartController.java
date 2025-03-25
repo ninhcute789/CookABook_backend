@@ -1,6 +1,7 @@
 package NandK.CookABook.controller;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,14 +32,14 @@ public class CartController {
         this.cartItemService = cartItemService;
     }
 
-    @GetMapping("/quantity/{cartId}")
+    @GetMapping("/{cartId}/quantity")
     @ApiMessage("Lấy số lượng sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<Integer> getTotalQuantity(@Valid @PathVariable Long cartId) throws IdInvalidException {
-        Cart cart = this.cartService.getCartById(cartId);
-        if (cart == null) {
-            throw new IdInvalidException("Cart id không hợp lệ");
+    public ResponseEntity<Integer> getTotalQuantityById(@Valid @PathVariable Long cartId) throws IdInvalidException {
+        Integer totalQuantity = this.cartService.getTotalQuantityById(cartId);
+        if (totalQuantity == null) {
+            throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
         }
-        return ResponseEntity.ok(cart.getTotalQuantity());
+        return ResponseEntity.ok(totalQuantity);
     }
 
     @GetMapping("{cartId}")
@@ -47,7 +48,7 @@ public class CartController {
             throws IdInvalidException {
         Cart cart = this.cartService.getCartById(cartId);
         if (cart == null) {
-            throw new IdInvalidException("Cart id không hợp lệ");
+            throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
         }
         return ResponseEntity.ok(this.cartService.convertToCartPreviewResponse(cart));
     }
@@ -58,9 +59,20 @@ public class CartController {
             throws IdInvalidException {
         CartItem cartItem = this.cartService.addToCart(request);
         if (cartItem == null) {
-            throw new IdInvalidException("Cart id hoặc book id không hợp lệ");
+            throw new IdInvalidException("Giỏ hàng với id = " + request.getCartId() + " hoặc sách với id = "
+                    + request.getBookId() + " không hợp lệ");
         }
         return ResponseEntity.ok(this.cartItemService.convertToCartItemResponse(cartItem));
     }
 
+    @DeleteMapping("{cartId}")
+    @ApiMessage("Xóa tất cả sản phẩm trong giỏ hàng thành công")
+    public ResponseEntity<Void> deleteAllCartItems(@Valid @PathVariable Long cartId) throws IdInvalidException {
+        Cart cart = this.cartService.getCartById(cartId);
+        if (cart == null) {
+            throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
+        }
+        this.cartService.deleteAllCartItems(cart);
+        return ResponseEntity.ok(null);
+    }
 }

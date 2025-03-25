@@ -420,9 +420,8 @@ public class BookService {
         return response;
     }
 
-    public void deleteBookById(Long bookId) {
+    public void deleteBook(Book book) {
         // xóa tất cả các danh mục liên quan đến sách trước khi xóa sách
-        Book book = this.getBookById(bookId);
         book.getCategories().forEach(category -> category.getBooks().remove(book));
         // xóa sách
         this.bookRepository.delete(book);

@@ -6,23 +6,19 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import NandK.CookABook.dto.response.cart.CartItemResponse;
-import NandK.CookABook.entity.Book;
 import NandK.CookABook.entity.Cart;
 import NandK.CookABook.entity.CartItem;
 import NandK.CookABook.repository.CartItemRepository;
+import NandK.CookABook.repository.CartRepository;
 
 @Service
 public class CartItemService {
     private final CartItemRepository cartItemRepository;
-    private final CartService cartService;
-    private final BookService bookService;
+    private final CartRepository cartRepository;
 
-    public CartItemService(CartItemRepository cartItemRepository,
-            CartService cartService,
-            BookService bookService) {
+    public CartItemService(CartItemRepository cartItemRepository, CartRepository cartRepository) {
         this.cartItemRepository = cartItemRepository;
-        this.cartService = cartService;
-        this.bookService = bookService;
+        this.cartRepository = cartRepository;
     }
 
     public CartItem getCartItemById(Long cartItemId) {
@@ -34,41 +30,44 @@ public class CartItemService {
         }
     }
 
-    public CartItem increaseCartItemQuantity(Long cartItemId) {
+    public void calculatePrice(CartItem cartItem) {
+        cartItem.setOriginalPrice(cartItem.getBook().getOriginalPrice() * cartItem.getQuantity());
+        cartItem.setDiscountPrice(
+                (cartItem.getBook().getOriginalPrice() - cartItem.getBook().getFinalPrice())
+                        * cartItem.getQuantity());
+        cartItem.setFinalPrice(cartItem.getBook().getFinalPrice() * cartItem.getQuantity());
+    }
+
+    public CartItem increaseCartItemQuantityById(Long cartItemId) {
         CartItem cartItem = this.getCartItemById(cartItemId);
         if (cartItem != null) {
             cartItem.setQuantity(cartItem.getQuantity() + 1);
-
+            this.calculatePrice(cartItem);
             return this.cartItemRepository.save(cartItem);
         } else {
             return null;
         }
     }
 
-    public CartItem decreaseCartItemQuantity(Long cartItemId) {
+    public CartItem decreaseCartItemQuantityById(Long cartItemId) {
         CartItem cartItem = this.getCartItemById(cartItemId);
         if (cartItem != null) {
-            if (cartItem.getQuantity() > 1) {
-                cartItem.setQuantity(cartItem.getQuantity() - 1);
-                return this.cartItemRepository.save(cartItem);
-            } else {
-                return null;
-            }
+            cartItem.setQuantity(cartItem.getQuantity() - 1);
+            this.calculatePrice(cartItem);
+            return this.cartItemRepository.save(cartItem);
         } else {
             return null;
         }
     }
 
-    public void deleteCartItem(Cart cart, Book book) {
-        CartItem existingCartItem = this.cartItemRepository.findByCartAndBook(cart, book);
-        if (existingCartItem != null) {
-            this.cartItemRepository.delete(existingCartItem);
-        }
-    }
-
-    public void deleteAllCartItems(Cart cart) {
-        List<CartItem> cartItems = this.cartItemRepository.findByCart(cart);
-        this.cartItemRepository.deleteAll(cartItems);
+    public void deleteCartItem(CartItem cartItem) {
+        Cart cart = cartItem.getCart();
+        cart.setTotalQuantity(cart.getTotalQuantity() - 1);
+        cart.setTotalOriginalPrice(cart.getTotalOriginalPrice() - cartItem.getOriginalPrice());
+        cart.setTotalDiscountPrice(cart.getTotalDiscountPrice() - cartItem.getDiscountPrice());
+        cart.setTotalFinalPrice(cart.getTotalFinalPrice() - cartItem.getFinalPrice());
+        this.cartRepository.save(cart);
+        this.cartItemRepository.delete(cartItem);
     }
 
     public List<CartItem> getCartItems(Cart cart) {
@@ -79,10 +78,9 @@ public class CartItemService {
         CartItemResponse cartItemResponse = new CartItemResponse(
                 cartItem.getId(),
                 cartItem.getQuantity(),
-                cartItem.getBook().getOriginalPrice() * cartItem.getQuantity(),
-                (cartItem.getBook().getOriginalPrice() - cartItem.getBook().getFinalPrice())
-                        * cartItem.getQuantity(),
-                cartItem.getBook().getFinalPrice() * cartItem.getQuantity(),
+                cartItem.getOriginalPrice(),
+                cartItem.getDiscountPrice(),
+                cartItem.getFinalPrice(),
                 new CartItemResponse.Cart(cartItem.getCart().getId()),
                 new CartItemResponse.Book(
                         cartItem.getBook().getId(),

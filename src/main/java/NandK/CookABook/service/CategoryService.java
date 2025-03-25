@@ -111,11 +111,10 @@ public class CategoryService {
         return categoryUpdateResponse;
     }
 
-    public void deleteCategoryById(Long categoryId) {
+    public void deleteCategory(Category category) {
         // Xóa tất cả các sách liên quan đến danh mục trước khi xóa danh mục
-        Category category = this.getCategoryById(categoryId);
         category.getBooks().forEach(book -> book.getCategories().remove(category));
         // Xóa danh mục
-        this.categoryRepository.deleteById(categoryId);
+        this.categoryRepository.delete(category);
     }
 }

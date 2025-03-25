@@ -170,10 +170,10 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
-    public void deleteUserById(Long userId) {
-        List<Article> articles = this.articleRepository.findByUserId(userId);
+    public void deleteUser(User user) {
+        List<Article> articles = this.articleRepository.findByUser(user);
         this.articleRepository.deleteAll(articles);
-        this.userRepository.deleteById(userId);
+        this.userRepository.delete(user);
     }
 
     public void updateUserRefreshToken(String refreshToken, String username) {
@@ -188,12 +188,7 @@ public class UserService {
         return this.userRepository.findByRefreshTokenAndUsername(refreshToken, username);
     }
 
-    public String getUserAvatarById(Long userId) {
-        User user = this.getUserById(userId);
-        if (user != null) {
-            return user.getAvatar();
-        } else {
-            return null;
-        }
+    public String getUserAvatar(User user) {
+        return user.getAvatar();
     }
 }

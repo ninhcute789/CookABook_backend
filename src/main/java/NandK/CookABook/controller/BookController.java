@@ -117,7 +117,7 @@ public class BookController {
         if (book == null) {
             throw new IdInvalidException("Không tìm thấy sách với id: " + bookId);
         }
-        this.bookService.deleteBookById(bookId);
+        this.bookService.deleteBook(book);
         return ResponseEntity.ok(null);
     }
 

@@ -1,9 +1,7 @@
 package NandK.CookABook.entity;
 
-import java.time.Instant;
 import java.util.List;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
@@ -14,7 +12,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
@@ -41,12 +38,4 @@ public class Cart {
     private Integer totalOriginalPrice;
     private Integer totalDiscountPrice;
     private Integer totalFinalPrice;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
-    private Instant createdAt;
-
-    @PrePersist
-    public void beforeCreate() {
-        this.setCreatedAt(Instant.now());
-    }
 }

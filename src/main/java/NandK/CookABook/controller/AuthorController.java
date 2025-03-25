@@ -92,7 +92,7 @@ public class AuthorController {
         if (author == null) {
             throw new IdInvalidException("Tác giả với id = " + authorId + " không tồn tại");
         }
-        this.authorService.deleteAuthorById(authorId);
+        this.authorService.deleteAuthor(author);
         return ResponseEntity.ok(null);
     }
 }

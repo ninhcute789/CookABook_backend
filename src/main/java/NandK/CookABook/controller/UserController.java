@@ -76,12 +76,17 @@ public class UserController {
 
     @GetMapping("/{userId}/avatar")
     @ApiMessage("Lấy avatar người dùng thành công")
-    public ResponseEntity<String> getUserAvatarById(@Valid @PathVariable Long userId) throws IdInvalidException {
-        String avatar = this.userService.getUserAvatarById(userId);
-        if (avatar == null) {
+    public ResponseEntity<String> getUserAvatar(@Valid @PathVariable Long userId) throws IdInvalidException {
+        User user = this.userService.getUserById(userId);
+        if (user == null) {
             throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(avatar);
+        String avatar = this.userService.getUserAvatar(user);
+        if (avatar == null) {
+            return ResponseEntity.status(HttpStatus.OK).body("");
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(avatar);
+        }
     }
 
     @PutMapping
@@ -107,7 +112,7 @@ public class UserController {
         if (user == null) {
             throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
         }
-        this.userService.deleteUserById(userId);
+        this.userService.deleteUser(user);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
