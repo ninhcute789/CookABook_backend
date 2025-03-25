@@ -74,6 +74,16 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserFindByIdResponse(user));
     }
 
+    @GetMapping("/{userId}/avatar")
+    @ApiMessage("Lấy avatar người dùng thành công")
+    public ResponseEntity<String> getUserAvatarById(@Valid @PathVariable Long userId) throws IdInvalidException {
+        String avatar = this.userService.getUserAvatarById(userId);
+        if (avatar == null) {
+            throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(avatar);
+    }
+
     @PutMapping
     @ApiMessage("Cập nhật người dùng thành công")
     public ResponseEntity<UserUpdateResponse> updateUser(@Valid @RequestBody UserUpdateRequest request)

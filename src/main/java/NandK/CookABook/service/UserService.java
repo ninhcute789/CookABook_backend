@@ -187,4 +187,13 @@ public class UserService {
     public User getUserByRefreshTokenAndUsername(String refreshToken, String username) {
         return this.userRepository.findByRefreshTokenAndUsername(refreshToken, username);
     }
+
+    public String getUserAvatarById(Long userId) {
+        User user = this.getUserById(userId);
+        if (user != null) {
+            return user.getAvatar();
+        } else {
+            return null;
+        }
+    }
 }
