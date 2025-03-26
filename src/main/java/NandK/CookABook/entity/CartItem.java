@@ -8,10 +8,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@Table(name = "cart_items")
 @Getter
 @Setter
 public class CartItem {
@@ -31,4 +33,5 @@ public class CartItem {
     private Integer originalPrice;
     private Integer discountPrice;
     private Integer finalPrice;
+    private Boolean selected;
 }

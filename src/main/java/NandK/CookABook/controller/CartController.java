@@ -50,6 +50,7 @@ public class CartController {
         if (cart == null) {
             throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
         }
+        this.cartService.calculateCartPrice(cart);
         return ResponseEntity.ok(this.cartService.convertToCartPreviewResponse(cart));
     }
 

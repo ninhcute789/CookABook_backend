@@ -15,6 +15,7 @@ public class CartItemResponse {
     private Integer originalPrice;
     private Integer discountPrice;
     private Integer finalPrice;
+    private Boolean selected;
     private Cart cart;
     private Book book;
 

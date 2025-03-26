@@ -81,6 +81,7 @@ public class CartItemService {
                 cartItem.getOriginalPrice(),
                 cartItem.getDiscountPrice(),
                 cartItem.getFinalPrice(),
+                cartItem.getSelected(),
                 new CartItemResponse.Cart(cartItem.getCart().getId()),
                 new CartItemResponse.Book(
                         cartItem.getBook().getId(),
@@ -91,5 +92,11 @@ public class CartItemService {
                         cartItem.getBook().getDiscountPercentage(),
                         cartItem.getBook().getFinalPrice()));
         return cartItemResponse;
+    }
+
+    // Cập nhật trạng thái selected cho CartItem
+    public void updateCartItemSelection(CartItem cartItem) {
+        cartItem.setSelected(!cartItem.getSelected()); // Đảo ngược trạng thái selected
+        cartItemRepository.save(cartItem); // Lưu lại thay đổi
     }
 }
