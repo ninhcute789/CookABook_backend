@@ -11,8 +11,6 @@ import NandK.CookABook.entity.CartItem;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    public List<CartItem> findByCartId(Long cartId);
-
     public CartItem findByCartAndBook(Cart cart, Book book);
 
     public List<CartItem> findByCart(Cart cart);
