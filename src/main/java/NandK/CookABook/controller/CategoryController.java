@@ -94,7 +94,7 @@ public class CategoryController {
         if (category == null) {
             throw new IdInvalidException("Danh mục với id = " + categoryId + " không tồn tại");
         }
-        this.categoryService.deleteCategoryById(categoryId);
+        this.categoryService.deleteCategory(category);
         return ResponseEntity.ok(null);
     }
 }

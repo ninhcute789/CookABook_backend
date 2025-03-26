@@ -161,7 +161,7 @@ public class ArticleService {
         return response;
     }
 
-    public void deleteArticleById(Long articleId) {
-        this.articleRepository.deleteById(articleId);
+    public void deleteArticle(Article article) {
+        this.articleRepository.delete(article);
     }
 }

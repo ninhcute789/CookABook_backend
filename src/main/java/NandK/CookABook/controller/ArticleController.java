@@ -84,7 +84,7 @@ public class ArticleController {
         if (article == null) {
             throw new IdInvalidException("Bài viết với id = " + articleId + " không tồn tại");
         }
-        this.articleService.deleteArticleById(articleId);
+        this.articleService.deleteArticle(article);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }

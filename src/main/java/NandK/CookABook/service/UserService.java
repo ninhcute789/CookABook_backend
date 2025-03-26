@@ -27,9 +27,12 @@ public class UserService {
 
     private final ArticleRepository articleRepository;
 
-    public UserService(UserRepository userRepository, ArticleRepository articleRepository) {
+    private final CartService cartService;
+
+    public UserService(UserRepository userRepository, ArticleRepository articleRepository, CartService cartService) {
         this.userRepository = userRepository;
         this.articleRepository = articleRepository;
+        this.cartService = cartService;
     }
 
     public boolean isUsernameExist(String username) {
@@ -45,7 +48,7 @@ public class UserService {
         user.setGender(request.getGender());
         user.setDob(request.getDob());
         user.setEmail(request.getEmail());
-
+        user.setCart(this.cartService.createCart(user));
         return this.userRepository.save(user);
 
     }
@@ -167,10 +170,10 @@ public class UserService {
         return this.userRepository.save(user);
     }
 
-    public void deleteUserById(Long userId) {
-        List<Article> articles = this.articleRepository.findByUserId(userId);
+    public void deleteUser(User user) {
+        List<Article> articles = this.articleRepository.findByUser(user);
         this.articleRepository.deleteAll(articles);
-        this.userRepository.deleteById(userId);
+        this.userRepository.delete(user);
     }
 
     public void updateUserRefreshToken(String refreshToken, String username) {
@@ -183,5 +186,9 @@ public class UserService {
 
     public User getUserByRefreshTokenAndUsername(String refreshToken, String username) {
         return this.userRepository.findByRefreshTokenAndUsername(refreshToken, username);
+    }
+
+    public String getUserAvatar(User user) {
+        return user.getAvatar();
     }
 }

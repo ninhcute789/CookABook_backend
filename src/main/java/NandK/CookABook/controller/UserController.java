@@ -57,21 +57,6 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToUserCreationResponse(user));
     }
 
-    @PostMapping("/register")
-    @ApiMessage("Đăng ký tài khoản thành công")
-    public ResponseEntity<UserCreationResponse> register(@Valid @RequestBody UserCreationRequest request)
-            throws IdInvalidException {
-        boolean isUserNameExist = this.userService.isUsernameExist(request.getUsername());
-        if (isUserNameExist) {
-            throw new IdInvalidException(
-                    "Username " + request.getUsername() + " đã tồn tại, vui lòng sử dụng username khác");
-        }
-        String hashPassword = this.passwordEncoder.encode(request.getPassword()); // ham encode tra ra String
-        request.setPassword(hashPassword);
-        User user = this.userService.createUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(this.userService.convertToUserCreationResponse(user));
-    }
-
     @GetMapping
     @ApiMessage("Lấy danh sách người dùng thành công")
     public ResponseEntity<ResultPagination> getAllUsers(
@@ -87,6 +72,21 @@ public class UserController {
             throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
         }
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserFindByIdResponse(user));
+    }
+
+    @GetMapping("/{userId}/avatar")
+    @ApiMessage("Lấy avatar người dùng thành công")
+    public ResponseEntity<String> getUserAvatar(@Valid @PathVariable Long userId) throws IdInvalidException {
+        User user = this.userService.getUserById(userId);
+        if (user == null) {
+            throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
+        }
+        String avatar = this.userService.getUserAvatar(user);
+        if (avatar == null) {
+            return ResponseEntity.status(HttpStatus.OK).body("");
+        } else {
+            return ResponseEntity.status(HttpStatus.OK).body(avatar);
+        }
     }
 
     @PutMapping
@@ -112,7 +112,7 @@ public class UserController {
         if (user == null) {
             throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
         }
-        this.userService.deleteUserById(userId);
+        this.userService.deleteUser(user);
         return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 
