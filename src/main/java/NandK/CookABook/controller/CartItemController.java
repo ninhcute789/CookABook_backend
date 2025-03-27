@@ -15,7 +15,7 @@ import NandK.CookABook.service.CartItemService;
 import NandK.CookABook.utils.annotation.ApiMessage;
 
 @RestController
-@RequestMapping("api/v1/cart-items")
+@RequestMapping("/api/v1/cart-items")
 public class CartItemController {
 
     private final CartItemService cartItemService;

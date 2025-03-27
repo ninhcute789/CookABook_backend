@@ -45,8 +45,6 @@ public class User {
     private String avatar;
     private LocalDate dob;
     private String email;
-    // private String avatarId;
-    // private String avatarURL;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
 

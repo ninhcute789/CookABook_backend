@@ -7,6 +7,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import NandK.CookABook.utils.constant.PaymentMethodEnum;
 import NandK.CookABook.utils.constant.PaymentStatusEnum;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,7 +30,11 @@ public class Payment {
     private Long id;
 
     private Integer amount;
+
+    @Enumerated(EnumType.STRING)
     private PaymentMethodEnum method;
+
+    @Enumerated(EnumType.STRING)
     private PaymentStatusEnum status;
 
     @ManyToOne

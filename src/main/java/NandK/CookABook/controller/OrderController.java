@@ -16,7 +16,7 @@ import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/v1/orders")
+@RequestMapping("/api/v1/orders")
 
 public class OrderController {
 
