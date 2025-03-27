@@ -2,7 +2,6 @@ package NandK.CookABook.dto.response.user;
 
 import java.time.Instant;
 import java.time.LocalDate;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -30,14 +29,4 @@ public class UserFoundResponse {
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant updatedAt;
-
-    private List<Article> articles;
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Article {
-        private Long id;
-    }
 }
