@@ -11,22 +11,23 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "order_items")
+@Table(name = "shipping_addresses")
 @Getter
 @Setter
-public class OrderItem {
+public class ShippingAddress {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer quantity;
-    private Integer price;
+    private String name;
+    private String phoneNumber;
+    private String city; // thành phố
+    private String district; // quận
+    private String ward; // phường
+    private String address; // đường
+    private Boolean defaultAddress = false; // địa chỉ mặc định
 
     @ManyToOne
-    @JoinColumn(name = "order_id")
-    private Order order;
-
-    @ManyToOne
-    @JoinColumn(name = "book_id")
-    private Book book;
+    @JoinColumn(name = "user_id")
+    private User user;
 }

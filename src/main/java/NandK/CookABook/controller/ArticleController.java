@@ -40,8 +40,11 @@ public class ArticleController {
     @PostMapping
     @ApiMessage("Tạo bài viết thành công")
     public ResponseEntity<ArticleCreationResponse> createArticle(
-            @Valid @RequestBody ArticleCreationRequest request) {
+            @Valid @RequestBody ArticleCreationRequest request) throws IdInvalidException {
         Article article = this.articleService.createArticle(request);
+        if (article == null) {
+            throw new IdInvalidException("Người dùng với id = " + request.getUserId() + " không tồn tại");
+        }
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(this.articleService.convertToArticleCreationResponse(article));
     }
@@ -55,7 +58,7 @@ public class ArticleController {
 
     @GetMapping("/{articleId}")
     @ApiMessage("Lấy bài viết thành công")
-    public ResponseEntity<ArticleFoundResponse> getArticleById(@Valid @PathVariable Long articleId)
+    public ResponseEntity<ArticleFoundResponse> getArticleById(@PathVariable Long articleId)
             throws IdInvalidException {
         Article article = this.articleService.getArticleById(articleId);
         if (article == null) {
@@ -78,7 +81,7 @@ public class ArticleController {
 
     @DeleteMapping("/{articleId}")
     @ApiMessage("Xóa bài viết thành công")
-    public ResponseEntity<Void> deleteArticleById(@Valid @PathVariable Long articleId)
+    public ResponseEntity<Void> deleteArticleById(@PathVariable Long articleId)
             throws IdInvalidException {
         Article article = this.articleService.getArticleById(articleId);
         if (article == null) {

@@ -83,7 +83,7 @@ public class CartItemService {
                 cartItem.getFinalPrice(),
                 cartItem.getSelected(),
                 new CartItemResponse.Cart(cartItem.getCart().getId()),
-                new CartItemResponse.Book(
+                new CartItemResponse.BookResponse(
                         cartItem.getBook().getId(),
                         cartItem.getBook().getTitle(),
                         cartItem.getBook().getImageURL(),

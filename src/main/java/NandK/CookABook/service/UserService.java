@@ -24,9 +24,7 @@ import NandK.CookABook.repository.UserRepository;
 public class UserService {
 
     private final UserRepository userRepository; // final: khong the thay doi gia tri cua bien
-
     private final ArticleRepository articleRepository;
-
     private final CartService cartService;
 
     public UserService(UserRepository userRepository, ArticleRepository articleRepository, CartService cartService) {

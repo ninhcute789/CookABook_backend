@@ -53,7 +53,7 @@ public class AuthorService {
 
     public Integer getNumberOfBooksByAuthorId(Long authorId) {
         Author author = this.getAuthorById(authorId);
-        Integer numberOfBooks = bookRepository.countByAuthorId(authorId);
+        Integer numberOfBooks = bookRepository.countByAuthor(author);
         author.setNumberOfBooks(numberOfBooks);
         return numberOfBooks;
     }

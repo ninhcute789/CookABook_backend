@@ -59,7 +59,7 @@ public class CategoryController {
 
     @GetMapping("/{categoryId}")
     @ApiMessage("Lấy danh mục thành công")
-    public ResponseEntity<Category> getCategoryById(@Valid @PathVariable Long categoryId)
+    public ResponseEntity<Category> getCategoryById(@PathVariable Long categoryId)
             throws IdInvalidException {
         Category category = this.categoryService.getCategoryById(categoryId);
         if (category == null) {
@@ -88,7 +88,7 @@ public class CategoryController {
 
     @DeleteMapping("/{categoryId}")
     @ApiMessage("Xóa danh mục thành công")
-    public ResponseEntity<Void> deleteCategoryById(@Valid @PathVariable Long categoryId)
+    public ResponseEntity<Void> deleteCategoryById(@PathVariable Long categoryId)
             throws IdInvalidException {
         Category category = this.categoryService.getCategoryById(categoryId);
         if (category == null) {

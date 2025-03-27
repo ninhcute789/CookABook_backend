@@ -13,7 +13,6 @@ import NandK.CookABook.entity.CartItem;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.CartItemService;
 import NandK.CookABook.utils.annotation.ApiMessage;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("api/v1/cart-items")
@@ -27,7 +26,7 @@ public class CartItemController {
 
     @PostMapping("/{cartItemId}/update-selected")
     @ApiMessage("Cập nhật trạng thái sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<Void> updateCartItemSelection(@Valid @PathVariable Long cartItemId)
+    public ResponseEntity<Void> updateCartItemSelection(@PathVariable Long cartItemId)
             throws IdInvalidException {
         CartItem cartItem = this.cartItemService.getCartItemById(cartItemId);
         if (cartItem == null) {
@@ -39,7 +38,7 @@ public class CartItemController {
 
     @GetMapping("/{cartItemId}")
     @ApiMessage("Lấy thông tin chi tiết sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<CartItemResponse> getCartItemById(@Valid @PathVariable Long cartItemId)
+    public ResponseEntity<CartItemResponse> getCartItemById(@PathVariable Long cartItemId)
             throws IdInvalidException {
         CartItem cartItem = this.cartItemService.getCartItemById(cartItemId);
         if (cartItem == null) {
@@ -50,7 +49,7 @@ public class CartItemController {
 
     @GetMapping("/{cartItemId}/increase")
     @ApiMessage("Tăng số lượng sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<CartItemResponse> increaseCartItemQuantityById(@Valid @PathVariable Long cartItemId)
+    public ResponseEntity<CartItemResponse> increaseCartItemQuantityById(@PathVariable Long cartItemId)
             throws IdInvalidException {
         CartItem cartItem = this.cartItemService.increaseCartItemQuantityById(cartItemId);
         if (cartItem == null) {
@@ -61,7 +60,7 @@ public class CartItemController {
 
     @GetMapping("/{cartItemId}/decrease")
     @ApiMessage("Giảm số lượng sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<CartItemResponse> decreaseCartItemQuantityById(@Valid @PathVariable Long cartItemId)
+    public ResponseEntity<CartItemResponse> decreaseCartItemQuantityById(@PathVariable Long cartItemId)
             throws IdInvalidException {
         CartItem cartItem = this.cartItemService.decreaseCartItemQuantityById(cartItemId);
         if (cartItem == null) {
@@ -76,7 +75,7 @@ public class CartItemController {
 
     @DeleteMapping("/{cartItemId}")
     @ApiMessage("Xóa sản phẩm khỏi giỏ hàng thành công")
-    public ResponseEntity<Void> deleteCartItemById(@Valid @PathVariable Long cartItemId) throws IdInvalidException {
+    public ResponseEntity<Void> deleteCartItemById(@PathVariable Long cartItemId) throws IdInvalidException {
         CartItem cartItem = this.cartItemService.getCartItemById(cartItemId);
         if (cartItem == null) {
             throw new IdInvalidException("Cart item với id = " + cartItemId + " không tồn tại");

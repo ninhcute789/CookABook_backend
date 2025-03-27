@@ -58,7 +58,7 @@ public class AuthorController {
 
     @GetMapping("/{authorId}")
     @ApiMessage("Lấy tác giả thành công")
-    public ResponseEntity<AuthorFoundResponse> getAuthorById(@Valid @PathVariable Long authorId)
+    public ResponseEntity<AuthorFoundResponse> getAuthorById(@PathVariable Long authorId)
             throws IdInvalidException {
         Author author = this.authorService.getAuthorById(authorId);
         if (author == null) {
@@ -86,7 +86,7 @@ public class AuthorController {
 
     @DeleteMapping("/{authorId}")
     @ApiMessage("Xóa tác giả thành công")
-    public ResponseEntity<Void> deleteAuthorById(@Valid @PathVariable Long authorId)
+    public ResponseEntity<Void> deleteAuthorById(@PathVariable Long authorId)
             throws IdInvalidException {
         Author author = this.authorService.getAuthorById(authorId);
         if (author == null) {
