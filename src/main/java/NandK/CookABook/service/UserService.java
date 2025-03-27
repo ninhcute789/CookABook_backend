@@ -74,12 +74,6 @@ public class UserService {
         response.setAvatar(user.getAvatar());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
-        if (user.getArticles() != null) {
-            List<UserFoundResponse.Article> articles = user.getArticles().stream().map(
-                    item -> new UserFoundResponse.Article(item.getId()))
-                    .collect(Collectors.toList());
-            response.setArticles(articles);
-        }
         return response;
     }
 
@@ -108,7 +102,7 @@ public class UserService {
         // set thong tin tra ra client
         result.setMeta(meta);
         // loai bo thong tin nhay cam
-        List<UserFoundResponse> listUser = users.getContent().stream().map(
+        List<UserFoundResponse> listUsers = users.getContent().stream().map(
                 item -> new UserFoundResponse(
                         item.getId(),
                         item.getUsername(),
@@ -118,12 +112,9 @@ public class UserService {
                         item.getEmail(),
                         item.getAvatar(),
                         item.getCreatedAt(),
-                        item.getUpdatedAt(),
-                        item.getArticles() != null ? item.getArticles().stream().map(
-                                article -> new UserFoundResponse.Article(article.getId()))
-                                .collect(Collectors.toList()) : null))
+                        item.getUpdatedAt()))
                 .collect(Collectors.toList());
-        result.setData(listUser);
+        result.setData(listUsers);
         return result;
     }
 
