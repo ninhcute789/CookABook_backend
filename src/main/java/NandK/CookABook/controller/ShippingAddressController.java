@@ -25,7 +25,7 @@ import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/shipping-addresses")
+@RequestMapping("/api/v1/shipping-addresses")
 public class ShippingAddressController {
 
     private final ShippingAddressService shippingAddressService;

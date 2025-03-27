@@ -21,7 +21,7 @@ import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/v1/carts")
+@RequestMapping("/api/v1/carts")
 public class CartController {
 
     private final CartService cartService;
