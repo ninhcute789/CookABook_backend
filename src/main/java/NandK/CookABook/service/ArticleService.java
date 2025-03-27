@@ -18,35 +18,30 @@ import NandK.CookABook.dto.response.article.ArticleUpdateResponse;
 import NandK.CookABook.entity.Article;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.repository.ArticleRepository;
-import NandK.CookABook.repository.UserRepository;
 
 @Service
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final UserService userService;
 
-    private final UserRepository userRepository;
-
-    public ArticleService(ArticleRepository articleRepository, UserRepository userRepository) {
+    public ArticleService(ArticleRepository articleRepository, UserService userService) {
         this.articleRepository = articleRepository;
-        this.userRepository = userRepository;
+        this.userService = userService;
     }
 
     public Article createArticle(ArticleCreationRequest request) {
-        Article article = new Article();
-        // check user
-        if (request.getUser() != null && request.getUser().getId() != null) {
-            Optional<User> userOptional = this.userRepository.findById(request.getUser().getId());
-            article.setUser(userOptional.isPresent() ? userOptional.get() : null);
+        User user = this.userService.getUserById(request.getUserId());
+        if (user != null) {
+            Article article = new Article();
+            article.setTitle(request.getTitle());
+            article.setContent(request.getContent());
+            article.setImageURL(request.getImageURL());
+            article.setUser(user);
+            return this.articleRepository.save(article);
         } else {
-            article.setUser(null);
+            return null;
         }
-
-        article.setTitle(request.getTitle());
-        article.setContent(request.getContent());
-        article.setImageURL(request.getImageURL());
-
-        return this.articleRepository.save(article);
     }
 
     public ArticleCreationResponse convertToArticleCreationResponse(Article article) {
@@ -58,11 +53,11 @@ public class ArticleService {
         response.setContent(article.getContent());
         response.setImageURL(article.getImageURL());
         response.setCreatedAt(article.getCreatedAt());
-        if (article.getUser() != null) {
-            user.setId(article.getUser().getId());
-            user.setName(article.getUser().getName());
-            response.setUser(user);
-        }
+
+        user.setId(article.getUser().getId());
+        user.setName(article.getUser().getName());
+        response.setUser(user);
+
         return response;
     }
 
@@ -78,7 +73,29 @@ public class ArticleService {
 
         result.setMeta(meta);
 
-        List<ArticleFoundResponse> listArticles = articles.getContent().stream().map(
+        List<ArticleFoundResponse> listArticles = this.convertToArticlesFoundResponse(articles.getContent());
+        result.setData(listArticles);
+        return result;
+    }
+
+    public ResultPagination getAllArticlesByUser(User user, Pageable pageable) {
+        Page<Article> articles = this.articleRepository.findByUser(user, pageable);
+        ResultPagination result = new ResultPagination();
+        ResultPagination.Meta meta = new ResultPagination.Meta();
+
+        meta.setPage(pageable.getPageNumber() + 1);
+        meta.setSize(pageable.getPageSize());
+        meta.setTotalPages(articles.getTotalPages());
+        meta.setTotalElements(articles.getTotalElements());
+        result.setMeta(meta);
+
+        List<ArticleFoundResponse> listArticles = this.convertToArticlesFoundResponse(articles.getContent());
+        result.setData(listArticles);
+        return result;
+    }
+
+    public List<ArticleFoundResponse> convertToArticlesFoundResponse(List<Article> articles) {
+        return articles.stream().map(
                 item -> new ArticleFoundResponse(
                         item.getId(),
                         item.getTitle(),
@@ -86,12 +103,10 @@ public class ArticleService {
                         item.getImageURL(),
                         item.getCreatedAt(),
                         item.getUpdatedAt(),
-                        item.getUser() != null ? new ArticleFoundResponse.User(
+                        new ArticleFoundResponse.User(
                                 item.getUser().getId(),
-                                item.getUser().getName()) : null))
+                                item.getUser().getName())))
                 .collect(Collectors.toList());
-        result.setData(listArticles);
-        return result;
     }
 
     public Article getArticleById(Long articleId) {
@@ -113,17 +128,18 @@ public class ArticleService {
         response.setImageURL(article.getImageURL());
         response.setCreatedAt(article.getCreatedAt());
         response.setUpdatedAt(article.getUpdatedAt());
-        if (article.getUser() != null) {
-            user.setId(article.getUser().getId());
-            user.setName(article.getUser().getName());
-            response.setUser(user);
-        }
+
+        user.setId(article.getUser().getId());
+        user.setName(article.getUser().getName());
+        response.setUser(user);
+
         return response;
     }
 
     public Article updateArticle(ArticleUpdateRequest request) {
         Article article = this.getArticleById(request.getId());
-        if (article != null) {
+        User user = this.userService.getUserById(request.getUserId());
+        if (article != null && user != null) {
             if (request.getTitle() != null && !request.getTitle().isBlank()) {
                 article.setTitle(request.getTitle());
             }
@@ -133,12 +149,7 @@ public class ArticleService {
             if (request.getImageURL() != null && !request.getImageURL().isBlank()) {
                 article.setImageURL(request.getImageURL());
             }
-            if (request.getUser() != null && request.getUser().getId() != null) {
-                Optional<User> userOptional = this.userRepository.findById(request.getUser().getId());
-                article.setUser(userOptional.isPresent() ? userOptional.get() : null);
-            } else {
-                article.setUser(null);
-            }
+            article.setUser(user);
             return this.articleRepository.save(article);
         } else {
             return null;
@@ -153,15 +164,15 @@ public class ArticleService {
         response.setContent(article.getContent());
         response.setImageURL(article.getImageURL());
         response.setUpdatedAt(article.getUpdatedAt());
-        if (article.getUser() != null) {
-            user.setId(article.getUser().getId());
-            user.setName(article.getUser().getName());
-            response.setUser(user);
-        }
+
+        user.setId(article.getUser().getId());
+        user.setName(article.getUser().getName());
+        response.setUser(user);
+
         return response;
     }
 
-    public void deleteArticleById(Long articleId) {
-        this.articleRepository.deleteById(articleId);
+    public void deleteArticle(Article article) {
+        this.articleRepository.delete(article);
     }
 }

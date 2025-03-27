@@ -32,7 +32,6 @@ public class Article {
     @Column(columnDefinition = "MEDIUMTEXT")
     private String content;
 
-    // private String imageId;
     private String imageURL;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7") // convert to GMT+7 timezone

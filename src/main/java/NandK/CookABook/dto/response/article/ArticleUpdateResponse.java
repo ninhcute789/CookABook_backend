@@ -13,7 +13,6 @@ public class ArticleUpdateResponse {
     private Long id;
     private String title;
     private String content;
-    // private String imageId;
     private String imageURL;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")

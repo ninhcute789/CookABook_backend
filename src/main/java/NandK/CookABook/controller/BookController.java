@@ -65,33 +65,33 @@ public class BookController {
         return ResponseEntity.ok(this.bookService.getBooksPreview(spec, pageable));
     }
 
-    @GetMapping("/all-by-author/{authorId}")
+    @GetMapping("/all-by-author-id/{authorId}")
     @ApiMessage("Lấy danh sách sách theo tác giả thành công")
-    public ResponseEntity<ResultPagination> getAllBooksByAuthor(
+    public ResponseEntity<ResultPagination> getAllBooksByAuthorId(
             @PathVariable Long authorId, Pageable pageable)
             throws IdInvalidException {
         Author author = this.authorService.getAuthorById(authorId);
         if (author == null) {
             throw new IdInvalidException("Không tìm thấy tác giả với id: " + authorId);
         }
-        return ResponseEntity.ok(this.bookService.getAllBooksByAuthor(authorId, pageable));
+        return ResponseEntity.ok(this.bookService.getAllBooksByAuthor(author, pageable));
     }
 
-    @GetMapping("/all-by-category/{categoryId}")
+    @GetMapping("/all-by-category-id/{categoryId}")
     @ApiMessage("Lấy danh sách sách theo danh mục thành công")
-    public ResponseEntity<ResultPagination> getAllBooksByCategory(
+    public ResponseEntity<ResultPagination> getAllBooksByCategoryId(
             @PathVariable Long categoryId, Pageable pageable)
             throws IdInvalidException {
         Category category = this.categoryService.getCategoryById(categoryId);
         if (category == null) {
             throw new IdInvalidException("Không tìm thấy danh mục với id: " + categoryId);
         }
-        return ResponseEntity.ok(this.bookService.getAllBooksByCategory(categoryId, pageable));
+        return ResponseEntity.ok(this.bookService.getAllBooksByCategory(category, pageable));
     }
 
     @GetMapping("/{bookId}")
     @ApiMessage("Lấy sách thành công")
-    public ResponseEntity<BookFoundResponse> getBookById(@Valid @PathVariable Long bookId) throws IdInvalidException {
+    public ResponseEntity<BookFoundResponse> getBookById(@PathVariable Long bookId) throws IdInvalidException {
         Book book = this.bookService.getBookById(bookId);
         if (book == null) {
             throw new IdInvalidException("Không tìm thấy sách với id: " + bookId);
@@ -112,12 +112,12 @@ public class BookController {
 
     @DeleteMapping("/{bookId}")
     @ApiMessage("Xóa sách thành công")
-    public ResponseEntity<Void> deleteBookById(@Valid @PathVariable Long bookId) throws IdInvalidException {
+    public ResponseEntity<Void> deleteBookById(@PathVariable Long bookId) throws IdInvalidException {
         Book book = this.bookService.getBookById(bookId);
         if (book == null) {
             throw new IdInvalidException("Không tìm thấy sách với id: " + bookId);
         }
-        this.bookService.deleteBookById(bookId);
+        this.bookService.deleteBook(book);
         return ResponseEntity.ok(null);
     }
 

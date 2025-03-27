@@ -1,5 +1,6 @@
 package NandK.CookABook.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
@@ -33,40 +34,16 @@ public class CartService {
     public Cart createCart(User user) {
         Cart cart = new Cart();
         cart.setUser(user);
-        cart.setTotalOriginalPrice(0);
         cart.setTotalQuantity(0);
+        cart.setTotalOriginalPrice(0);
+        cart.setTotalDiscountPrice(0);
+        cart.setTotalFinalPrice(0);
         return this.cartRepository.save(cart);
     }
-
-    // // Lấy hoặc tạo giỏ hàng cho user sau khi đăng nhập
-    // public Cart getOrCreateCartForUser(Long userId) {
-    // User user = this.userService.getUserById(userId);
-    // if (user != null) {
-    // Cart cart = cartRepository.findByUser(user);
-    // if (cart == null) {
-    // cart = new Cart();
-    // cart.setUser(user);
-    // cart.setTotalQuantity(0);
-    // cart.setTotalOriginalPrice(0);
-    // return cartRepository.save(cart);
-    // } else {
-    // return getCartById(cart.getId());
-    // }
-    // } else {
-    // return null;
-    // }
-    // }
 
     public Cart getCartById(Long cartId) {
         Optional<Cart> cart = this.cartRepository.findById(cartId);
         if (cart.isPresent()) {
-            cart.get().setTotalQuantity(this.cartItemRepository.findByCartId(cartId).size());
-            cart.get().setTotalOriginalPrice(this.cartItemRepository.findByCartId(cartId).stream()
-                    .mapToInt(CartItem::getOriginalPrice).sum());
-            cart.get().setTotalDiscountPrice(this.cartItemRepository.findByCartId(cartId).stream()
-                    .mapToInt(CartItem::getDiscountPrice).sum());
-            cart.get().setTotalFinalPrice(this.cartItemRepository.findByCartId(cartId).stream()
-                    .mapToInt(CartItem::getFinalPrice).sum());
             return cart.get();
         } else {
             return null;
@@ -74,7 +51,7 @@ public class CartService {
     }
 
     // Lấy số lượng sản phẩm trong giỏ hàng để hiển thị trên giỏ hàng
-    public Integer getTotalQuantity(Long cartId) {
+    public Integer getTotalQuantityById(Long cartId) {
         Cart cart = this.getCartById(cartId);
         if (cart != null) {
             return cart.getTotalQuantity();
@@ -97,6 +74,8 @@ public class CartService {
                 existingCartItem.setDiscountPrice(
                         (book.getOriginalPrice() - book.getFinalPrice()) * existingCartItem.getQuantity());
                 existingCartItem.setFinalPrice(book.getFinalPrice() * existingCartItem.getQuantity());
+                existingCartItem.setSelected(true);
+                // Cập nhật thông tin CartItem
                 return this.cartItemRepository.save(existingCartItem);
             } else {
                 // Nếu chưa có, tạo mới CartItem
@@ -108,15 +87,18 @@ public class CartService {
                 newCartItem.setDiscountPrice(
                         (book.getOriginalPrice() - book.getFinalPrice()) * addToCartRequest.getQuantity());
                 newCartItem.setFinalPrice(book.getFinalPrice() * addToCartRequest.getQuantity());
+                newCartItem.setSelected(true);
+                // Cập nhật số lượng sản phẩm trong giỏ hàng
+                cart.setTotalQuantity(cart.getTotalQuantity() + 1);
+                // Lưu thông tin CartItem
                 return this.cartItemRepository.save(newCartItem);
             }
         } else {
             return null;
         }
-
     }
 
-    // TODO: Xử lý cập nhật số lượng sách trong giỏ hàng
+    // Chuyển thông tin giỏ hàng sang dạng response
     public CartPreviewResponse convertToCartPreviewResponse(Cart cart) {
         CartPreviewResponse cartPreviewResponse = new CartPreviewResponse();
         cartPreviewResponse.setId(cart.getId());
@@ -131,9 +113,10 @@ public class CartService {
                 cartItem.getOriginalPrice(),
                 cartItem.getDiscountPrice(),
                 cartItem.getFinalPrice(),
+                cartItem.getSelected(),
                 new CartItemResponse.Cart(
                         cartItem.getCart().getId()),
-                new CartItemResponse.Book(
+                new CartItemResponse.BookResponse(
                         cartItem.getBook().getId(),
                         cartItem.getBook().getTitle(),
                         cartItem.getBook().getImageURL(),
@@ -142,8 +125,31 @@ public class CartService {
                         cartItem.getBook().getDiscountPercentage(),
                         cartItem.getBook().getFinalPrice())))
                 .toList());
-
         return cartPreviewResponse;
+    }
 
+    // Tính tổng tiền giỏ hàng chỉ cho những sản phẩm được chọn
+    public void calculateCartPrice(Cart cart) {
+        List<CartItem> cartItems = this.cartItemRepository.findByCart(cart);
+        if (cartItems != null) {
+            for (CartItem cartItem : cartItems) {
+                if (cartItem.getSelected()) {
+                    cart.setTotalOriginalPrice(cart.getTotalOriginalPrice() + cartItem.getOriginalPrice());
+                    cart.setTotalDiscountPrice(cart.getTotalDiscountPrice() + cartItem.getDiscountPrice());
+                    cart.setTotalFinalPrice(cart.getTotalFinalPrice() + cartItem.getFinalPrice());
+                }
+                this.cartRepository.save(cart);
+            }
+        }
+    }
+
+    // Xóa tất cả sản phẩm trong giỏ hàng
+    public void deleteAllCartItems(Cart cart) {
+        cart.setTotalQuantity(0);
+        cart.setTotalOriginalPrice(0);
+        cart.setTotalDiscountPrice(0);
+        cart.setTotalFinalPrice(0);
+        this.cartRepository.save(cart);
+        this.cartItemRepository.deleteAll(cart.getCartItems());
     }
 }
