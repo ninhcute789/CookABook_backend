@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class BookUpdateRequest {
-    @NotNull(message = "Id không được để trống")
+    @NotNull(message = "Id sách không được để trống")
     private Long id;
 
     private String title;

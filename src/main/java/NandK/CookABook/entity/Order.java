@@ -40,11 +40,6 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum status;
 
-    // private String name;
-    // private String address;
-    // private String phoneNumber;
-    // private String email;
-
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
