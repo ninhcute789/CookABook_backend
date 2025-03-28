@@ -18,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -39,10 +40,10 @@ public class Order {
     @Enumerated(EnumType.STRING)
     private OrderStatusEnum status;
 
-    private String name;
-    private String address;
-    private String phoneNumber;
-    private String email;
+    // private String name;
+    // private String address;
+    // private String phoneNumber;
+    // private String email;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -52,9 +53,14 @@ public class Order {
     @JsonIgnore
     private List<OrderItem> orderItems;
 
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    @OneToOne
+    @JoinColumn(name = "payment_id")
     @JsonIgnore
-    private List<Payment> payments;
+    private Payment payments;
+
+    @ManyToOne
+    @JoinColumn(name = "shipping_address_id")
+    private ShippingAddress shippingAddress;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createdAt;
