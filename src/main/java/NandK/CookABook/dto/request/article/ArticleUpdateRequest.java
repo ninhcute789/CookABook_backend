@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ArticleUpdateRequest {
-    @NotNull(message = "Id không được để trống")
+    @NotNull(message = "Id bài viết không được để trống")
     private Long id;
 
     private String title;

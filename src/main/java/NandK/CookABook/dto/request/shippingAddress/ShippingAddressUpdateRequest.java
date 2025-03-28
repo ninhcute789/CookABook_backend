@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ShippingAddressUpdateRequest {
-    @NotNull(message = "Id không được để trống")
+    @NotNull(message = "Id địa chỉ không được để trống")
     private Long id;
 
     private String name;

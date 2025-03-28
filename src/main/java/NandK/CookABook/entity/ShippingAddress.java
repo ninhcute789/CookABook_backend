@@ -24,7 +24,7 @@ public class ShippingAddress {
     private String city; // thành phố
     private String district; // quận
     private String ward; // phường
-    private String address; // đường
+    private String address; // địa chỉ cụ thể
     private Boolean defaultAddress = false; // địa chỉ mặc định
 
     @ManyToOne

@@ -59,7 +59,7 @@ public class ShippingAddressService {
         shippingAddressResponse.setCity(shippingAddress.getCity());
         shippingAddressResponse.setDistrict(shippingAddress.getDistrict());
         shippingAddressResponse.setWard(shippingAddress.getWard());
-        shippingAddressResponse.setStreet(shippingAddress.getAddress());
+        shippingAddressResponse.setAddress(shippingAddress.getAddress());
         shippingAddressResponse.setDefaultAddress(shippingAddress.getDefaultAddress());
         shippingAddressResponse.setUserId(shippingAddress.getUser().getId());
         return shippingAddressResponse;

@@ -12,7 +12,7 @@ public class ShippingAddressResponse {
     private String city;
     private String district;
     private String ward;
-    private String street;
+    private String address;
     private Boolean defaultAddress;
     private Long userId;
 }
