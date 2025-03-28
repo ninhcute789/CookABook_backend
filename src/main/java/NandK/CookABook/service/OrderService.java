@@ -34,10 +34,8 @@ public class OrderService {
         order.setTotalQuantity(cart.getTotalQuantity());
         order.setTotalPrice(cart.getTotalFinalPrice());
         order.setStatus(OrderStatusEnum.PENDING);
-        order.setName(request.getName());
-        order.setAddress(request.getAddress());
-        order.setPhoneNumber(request.getPhoneNumber());
-        order.setEmail(request.getEmail());
+        // order.setPaymentMethod(request.getPaymentMethod());
+        // order.setShippingAddress(request.getShippingAddress());
 
         List<CartItem> cartItems = cart.getCartItems();
         List<OrderItem> orderItems = new ArrayList<>();

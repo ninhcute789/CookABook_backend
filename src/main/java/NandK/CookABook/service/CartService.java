@@ -138,7 +138,6 @@ public class CartService {
                     cart.setTotalDiscountPrice(cart.getTotalDiscountPrice() + cartItem.getDiscountPrice());
                     cart.setTotalFinalPrice(cart.getTotalFinalPrice() + cartItem.getFinalPrice());
                 }
-                // this.cartRepository.save(cart); //TODO: check this logic for order
             }
         }
     }
