@@ -15,8 +15,9 @@ public class CartItemResponse {
     private Integer originalPrice;
     private Integer discountPrice;
     private Integer finalPrice;
+    private Boolean selected;
     private Cart cart;
-    private Book book;
+    private BookResponse book;
 
     @Getter
     @Setter
@@ -30,7 +31,7 @@ public class CartItemResponse {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Book {
+    public static class BookResponse {
         private Long id;
         private String title;
         private String imageURL;

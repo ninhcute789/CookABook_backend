@@ -45,8 +45,6 @@ public class User {
     private String avatar;
     private LocalDate dob;
     private String email;
-    // private String avatarId;
-    // private String avatarURL;
     @Column(columnDefinition = "MEDIUMTEXT")
     private String refreshToken;
 
@@ -65,6 +63,15 @@ public class User {
 
     @OneToOne(mappedBy = "user", cascade = { CascadeType.REMOVE, CascadeType.PERSIST })
     private Cart cart;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = { CascadeType.REMOVE,
+            CascadeType.PERSIST }, orphanRemoval = true)
+    @JsonIgnore
+    private List<Order> orders;
+
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @JsonIgnore
+    private List<ShippingAddress> shippingAddresses;
 
     @PrePersist
     public void beforeCreate() {

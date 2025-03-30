@@ -141,7 +141,6 @@ public class BookService {
         meta.setSize(pageable.getPageSize());
         meta.setTotalPages(books.getTotalPages());
         meta.setTotalElements(books.getTotalElements());
-
         result.setMeta(meta);
 
         List<BookFoundResponse> listBooks = books.getContent().stream().map(
@@ -207,7 +206,6 @@ public class BookService {
         meta.setSize(pageable.getPageSize());
         meta.setTotalPages(books.getTotalPages());
         meta.setTotalElements(books.getTotalElements());
-
         result.setMeta(meta);
 
         List<BookPreviewResponse> listBooks = this.convertToBookPreviewResponses(books.getContent());
@@ -215,8 +213,8 @@ public class BookService {
         return result;
     }
 
-    public ResultPagination getAllBooksByCategory(Long categoryId, Pageable pageable) {
-        Page<Book> books = this.bookRepository.findByCategories_Id(categoryId, pageable);
+    public ResultPagination getAllBooksByCategory(Category category, Pageable pageable) {
+        Page<Book> books = this.bookRepository.findByCategoriesContaining(category, pageable);
         ResultPagination result = new ResultPagination();
         ResultPagination.Meta meta = new ResultPagination.Meta();
 
@@ -224,7 +222,6 @@ public class BookService {
         meta.setSize(pageable.getPageSize());
         meta.setTotalPages(books.getTotalPages());
         meta.setTotalElements(books.getTotalElements());
-
         result.setMeta(meta);
 
         List<BookPreviewResponse> listBooks = this.convertToBookPreviewResponses(books.getContent());
@@ -232,8 +229,8 @@ public class BookService {
         return result;
     }
 
-    public ResultPagination getAllBooksByAuthor(Long authorId, Pageable pageable) {
-        Page<Book> books = this.bookRepository.findByAuthorId(authorId, pageable);
+    public ResultPagination getAllBooksByAuthor(Author author, Pageable pageable) {
+        Page<Book> books = this.bookRepository.findByAuthor(author, pageable);
         ResultPagination result = new ResultPagination();
         ResultPagination.Meta meta = new ResultPagination.Meta();
 
@@ -241,7 +238,6 @@ public class BookService {
         meta.setSize(pageable.getPageSize());
         meta.setTotalPages(books.getTotalPages());
         meta.setTotalElements(books.getTotalElements());
-
         result.setMeta(meta);
 
         List<BookPreviewResponse> listBooks = this.convertToBookPreviewResponses(books.getContent());

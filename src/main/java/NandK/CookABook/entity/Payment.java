@@ -1,24 +1,19 @@
 package NandK.CookABook.entity;
 
 import java.time.Instant;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import NandK.CookABook.utils.constant.OrderStatusEnum;
-import jakarta.persistence.CascadeType;
+import NandK.CookABook.utils.constant.PaymentMethodEnum;
+import NandK.CookABook.utils.constant.PaymentStatusEnum;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -26,36 +21,29 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Table(name = "orders")
+@Table(name = "payments")
 @Getter
 @Setter
-public class Order {
+public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer totalQuantity;
-    private Integer totalPrice;
+    private Integer amount;
 
     @Enumerated(EnumType.STRING)
-    private OrderStatusEnum status;
+    private PaymentMethodEnum method;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentStatusEnum status;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-    @JsonIgnore
-    private List<OrderItem> orderItems;
-
-    @OneToOne
-    @JoinColumn(name = "payment_id")
-    @JsonIgnore
-    private Payment payments;
-
-    @ManyToOne
-    @JoinColumn(name = "shipping_address_id")
-    private ShippingAddress shippingAddress;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
     private Instant createdAt;

@@ -9,16 +9,13 @@ import NandK.CookABook.dto.response.cart.CartItemResponse;
 import NandK.CookABook.entity.Cart;
 import NandK.CookABook.entity.CartItem;
 import NandK.CookABook.repository.CartItemRepository;
-import NandK.CookABook.repository.CartRepository;
 
 @Service
 public class CartItemService {
     private final CartItemRepository cartItemRepository;
-    private final CartRepository cartRepository;
 
-    public CartItemService(CartItemRepository cartItemRepository, CartRepository cartRepository) {
+    public CartItemService(CartItemRepository cartItemRepository) {
         this.cartItemRepository = cartItemRepository;
-        this.cartRepository = cartRepository;
     }
 
     public CartItem getCartItemById(Long cartItemId) {
@@ -30,7 +27,7 @@ public class CartItemService {
         }
     }
 
-    public void calculatePrice(CartItem cartItem) {
+    public void calculateItemPrice(CartItem cartItem) {
         cartItem.setOriginalPrice(cartItem.getBook().getOriginalPrice() * cartItem.getQuantity());
         cartItem.setDiscountPrice(
                 (cartItem.getBook().getOriginalPrice() - cartItem.getBook().getFinalPrice())
@@ -42,7 +39,7 @@ public class CartItemService {
         CartItem cartItem = this.getCartItemById(cartItemId);
         if (cartItem != null) {
             cartItem.setQuantity(cartItem.getQuantity() + 1);
-            this.calculatePrice(cartItem);
+            this.calculateItemPrice(cartItem);
             return this.cartItemRepository.save(cartItem);
         } else {
             return null;
@@ -53,7 +50,7 @@ public class CartItemService {
         CartItem cartItem = this.getCartItemById(cartItemId);
         if (cartItem != null) {
             cartItem.setQuantity(cartItem.getQuantity() - 1);
-            this.calculatePrice(cartItem);
+            this.calculateItemPrice(cartItem);
             return this.cartItemRepository.save(cartItem);
         } else {
             return null;
@@ -62,11 +59,9 @@ public class CartItemService {
 
     public void deleteCartItem(CartItem cartItem) {
         Cart cart = cartItem.getCart();
-        cart.setTotalQuantity(cart.getTotalQuantity() - 1);
-        cart.setTotalOriginalPrice(cart.getTotalOriginalPrice() - cartItem.getOriginalPrice());
-        cart.setTotalDiscountPrice(cart.getTotalDiscountPrice() - cartItem.getDiscountPrice());
-        cart.setTotalFinalPrice(cart.getTotalFinalPrice() - cartItem.getFinalPrice());
-        this.cartRepository.save(cart);
+        if (cartItem.getSelected()) {
+            cart.setTotalQuantity(cart.getTotalQuantity() - 1);
+        }
         this.cartItemRepository.delete(cartItem);
     }
 
@@ -81,8 +76,9 @@ public class CartItemService {
                 cartItem.getOriginalPrice(),
                 cartItem.getDiscountPrice(),
                 cartItem.getFinalPrice(),
+                cartItem.getSelected(),
                 new CartItemResponse.Cart(cartItem.getCart().getId()),
-                new CartItemResponse.Book(
+                new CartItemResponse.BookResponse(
                         cartItem.getBook().getId(),
                         cartItem.getBook().getTitle(),
                         cartItem.getBook().getImageURL(),
@@ -91,5 +87,16 @@ public class CartItemService {
                         cartItem.getBook().getDiscountPercentage(),
                         cartItem.getBook().getFinalPrice()));
         return cartItemResponse;
+    }
+
+    // Cập nhật trạng thái selected cho CartItem
+    public void updateCartItemSelection(CartItem cartItem) {
+        cartItem.setSelected(!cartItem.getSelected()); // Đảo ngược trạng thái selected
+        if (cartItem.getSelected()) {
+            cartItem.getCart().setTotalQuantity(cartItem.getCart().getTotalQuantity() + 1);
+        } else {
+            cartItem.getCart().setTotalQuantity(cartItem.getCart().getTotalQuantity() - 1);
+        }
+        this.cartItemRepository.save(cartItem); // Lưu lại thay đổi
     }
 }

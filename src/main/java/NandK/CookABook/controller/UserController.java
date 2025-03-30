@@ -12,6 +12,7 @@ import NandK.CookABook.dto.response.user.UserFoundResponse;
 import NandK.CookABook.dto.response.user.UserUpdateResponse;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
+import NandK.CookABook.service.ArticleService;
 import NandK.CookABook.service.UserService;
 import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -35,11 +37,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 public class UserController {
 
     private final UserService userService;
+    private final ArticleService articleService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
+    public UserController(UserService userService, ArticleService articleService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
+        this.articleService = articleService;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping
@@ -64,9 +68,21 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.getAllUsers(spec, pageable));
     }
 
+    @GetMapping("/{userId}/articles")
+    @ApiMessage("Lấy danh sách bài viết theo userId thành công")
+    public ResponseEntity<ResultPagination> getArticlesByUserId(
+            @PathVariable Long userId, Pageable pageable) throws IdInvalidException {
+        User user = this.userService.getUserById(userId);
+        if (user == null) {
+            throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(this.articleService.getAllArticlesByUser(user, pageable));
+    }
+
     @GetMapping("/{userId}")
     @ApiMessage("Lấy người dùng thành công")
-    public ResponseEntity<UserFoundResponse> getUserById(@Valid @PathVariable Long userId) throws IdInvalidException {
+    public ResponseEntity<UserFoundResponse> getUserById(@PathVariable Long userId)
+            throws IdInvalidException {
         User user = this.userService.getUserById(userId);
         if (user == null) {
             throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
@@ -76,7 +92,7 @@ public class UserController {
 
     @GetMapping("/{userId}/avatar")
     @ApiMessage("Lấy avatar người dùng thành công")
-    public ResponseEntity<String> getUserAvatar(@Valid @PathVariable Long userId) throws IdInvalidException {
+    public ResponseEntity<String> getUserAvatar(@PathVariable Long userId) throws IdInvalidException {
         User user = this.userService.getUserById(userId);
         if (user == null) {
             throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
@@ -107,7 +123,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @ApiMessage("Xóa người dùng thành công")
-    public ResponseEntity<Void> deleteUserById(@Valid @PathVariable Long userId) throws IdInvalidException {
+    public ResponseEntity<Void> deleteUserById(@PathVariable Long userId) throws IdInvalidException {
         User user = this.userService.getUserById(userId);
         if (user == null) {
             throw new IdInvalidException("User với Id = " + userId + " không tồn tại");

@@ -21,7 +21,7 @@ import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("api/v1/carts")
+@RequestMapping("/api/v1/carts")
 public class CartController {
 
     private final CartService cartService;
@@ -34,7 +34,7 @@ public class CartController {
 
     @GetMapping("/{cartId}/quantity")
     @ApiMessage("Lấy số lượng sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<Integer> getTotalQuantityById(@Valid @PathVariable Long cartId) throws IdInvalidException {
+    public ResponseEntity<Integer> getTotalQuantityById(@PathVariable Long cartId) throws IdInvalidException {
         Integer totalQuantity = this.cartService.getTotalQuantityById(cartId);
         if (totalQuantity == null) {
             throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
@@ -44,12 +44,13 @@ public class CartController {
 
     @GetMapping("{cartId}")
     @ApiMessage("Lấy giỏ hàng thành công")
-    public ResponseEntity<CartPreviewResponse> getCartById(@Valid @PathVariable Long cartId)
+    public ResponseEntity<CartPreviewResponse> getCartById(@PathVariable Long cartId)
             throws IdInvalidException {
         Cart cart = this.cartService.getCartById(cartId);
         if (cart == null) {
             throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
         }
+        this.cartService.calculateCartPrice(cart);
         return ResponseEntity.ok(this.cartService.convertToCartPreviewResponse(cart));
     }
 
@@ -67,7 +68,7 @@ public class CartController {
 
     @DeleteMapping("{cartId}")
     @ApiMessage("Xóa tất cả sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<Void> deleteAllCartItems(@Valid @PathVariable Long cartId) throws IdInvalidException {
+    public ResponseEntity<Void> deleteAllCartItems(@PathVariable Long cartId) throws IdInvalidException {
         Cart cart = this.cartService.getCartById(cartId);
         if (cart == null) {
             throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
