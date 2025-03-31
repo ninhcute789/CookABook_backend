@@ -99,6 +99,16 @@ public class BookController {
         return ResponseEntity.ok(this.bookService.convertToBookFoundResponse(book));
     }
 
+    @GetMapping("/{bookId}/detail")
+    @ApiMessage("Lấy sách chi tiết thành công")
+    public ResponseEntity<BookFoundResponse> getBookDetailById(@PathVariable Long bookId) throws IdInvalidException {
+        Book book = this.bookService.getBookById(bookId);
+        if (book == null) {
+            throw new IdInvalidException("Không tìm thấy sách với id: " + bookId);
+        }
+        return ResponseEntity.ok(this.bookService.convertToBookFoundResponse(book));
+    }
+
     @PutMapping
     @ApiMessage("Cập nhật sách thành công")
     public ResponseEntity<BookUpdateResponse> updateBook(@Valid @RequestBody BookUpdateRequest request)

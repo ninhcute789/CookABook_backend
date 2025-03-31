@@ -45,9 +45,10 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(
                         authz -> authz.requestMatchers("/", "/api/v1/auth/login",
                                 "/api/v1/auth/refresh", "/api/v1/auth/register", "/api/v1/articles/all",
-                                "/api/v1/books/preview", "/api/v1/categories/all",
-                                "/api/v1/books/all-by-author/{authorId}",
-                                "api/v1/books/all-by-category/{categoryId}").permitAll()
+                                "/api/v1/categories/all", "/api/v1/books/preview",
+                                "/api/v1/books/{bookId}/detail",
+                                "/api/v1/books/all-by-author-id/{authorId}/**",
+                                "/api/v1/books/all-by-category-id/{categoryId}/**").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
