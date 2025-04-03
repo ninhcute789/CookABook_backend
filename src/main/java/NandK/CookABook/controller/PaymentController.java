@@ -17,12 +17,15 @@ import com.turkraft.springfilter.boot.Filter;
 import NandK.CookABook.dto.request.payment.PaymentCreationRequest;
 import NandK.CookABook.dto.request.payment.PaymentStatusUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.cart.CartPaymentResponse;
 import NandK.CookABook.dto.response.payment.PaymentCreationResponse;
 import NandK.CookABook.dto.response.payment.PaymentFoundResponse;
 import NandK.CookABook.dto.response.payment.PaymentUpdateResponse;
+import NandK.CookABook.entity.Cart;
 import NandK.CookABook.entity.Payment;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
+import NandK.CookABook.service.CartService;
 import NandK.CookABook.service.PaymentService;
 import NandK.CookABook.service.UserService;
 import NandK.CookABook.utils.annotation.ApiMessage;
@@ -34,10 +37,12 @@ public class PaymentController {
 
     private final PaymentService paymentService;
     private final UserService userService;
+    private final CartService cartService;
 
-    public PaymentController(PaymentService paymentService, UserService userService) {
+    public PaymentController(PaymentService paymentService, UserService userService, CartService cartService) {
         this.paymentService = paymentService;
         this.userService = userService;
+        this.cartService = cartService;
     }
 
     @PostMapping
@@ -69,6 +74,18 @@ public class PaymentController {
             throw new IdInvalidException("Không tìm thấy thanh toán có id = " + paymentId);
         }
         return ResponseEntity.ok(this.paymentService.convertToPaymentFoundResponse(payment));
+    }
+
+    @GetMapping("/get-cart/{cartId}")
+    @ApiMessage("Lấy giỏ hàng thanh toán thành công")
+    public ResponseEntity<CartPaymentResponse> getCartPaymentById(@PathVariable Long cartId)
+            throws IdInvalidException {
+        Cart cart = this.cartService.getCartById(cartId);
+        if (cart == null) {
+            throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
+        }
+        // this.cartService.calculateCartPrice(cart);
+        return ResponseEntity.ok(this.cartService.convertToCartPaymentResponse(cart));
     }
 
     @PutMapping

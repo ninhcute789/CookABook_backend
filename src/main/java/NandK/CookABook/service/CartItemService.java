@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import NandK.CookABook.dto.response.cart.CartItemPaymentResponse;
 import NandK.CookABook.dto.response.cart.CartItemResponse;
 import NandK.CookABook.entity.Cart;
 import NandK.CookABook.entity.CartItem;
@@ -86,6 +87,19 @@ public class CartItemService {
                         cartItem.getBook().getDiscountPercentage(),
                         cartItem.getBook().getFinalPrice()));
         return cartItemResponse;
+    }
+
+    public CartItemPaymentResponse convertToCartItemPaymentResponse(CartItem cartItem) {
+        CartItemPaymentResponse cartItemPaymentResponse = new CartItemPaymentResponse(
+                cartItem.getId(),
+                cartItem.getQuantity(),
+                new CartItemPaymentResponse.BookPaymentResponse(
+                        cartItem.getBook().getId(),
+                        cartItem.getBook().getTitle(),
+                        cartItem.getBook().getImageURL(),
+                        cartItem.getBook().getOriginalPrice(),
+                        cartItem.getBook().getFinalPrice()));
+        return cartItemPaymentResponse;
     }
 
     // Cập nhật trạng thái selected cho CartItem

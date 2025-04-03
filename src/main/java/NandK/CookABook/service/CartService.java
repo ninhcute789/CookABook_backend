@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 
 import NandK.CookABook.dto.request.cart.AddToCartRequest;
 import NandK.CookABook.dto.response.cart.CartItemResponse;
+import NandK.CookABook.dto.response.cart.CartPaymentResponse;
+import NandK.CookABook.dto.response.cart.CartItemPaymentResponse;
 import NandK.CookABook.dto.response.cart.CartPreviewResponse;
 import NandK.CookABook.entity.Book;
 import NandK.CookABook.entity.Cart;
@@ -18,16 +20,17 @@ import NandK.CookABook.repository.CartRepository;
 @Service
 public class CartService {
 
+    private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final BookService bookService;
-    private final CartRepository cartRepository;
+    private final CartItemService cartItemService;
 
-    public CartService(CartRepository cartRepository,
-            CartItemRepository cartItemRepository,
-            BookService bookService) {
+    public CartService(CartRepository cartRepository, CartItemRepository cartItemRepository,
+            BookService bookService, CartItemService cartItemService) {
         this.cartRepository = cartRepository;
         this.cartItemRepository = cartItemRepository;
         this.bookService = bookService;
+        this.cartItemService = cartItemService;
     }
 
     // Tạo giỏ hàng mới cho user lần đầu đăng ký
@@ -107,23 +110,29 @@ public class CartService {
         cartPreviewResponse.setTotalFinalPrice(cart.getTotalFinalPrice());
         cartPreviewResponse.setTotalDiscountPrice(cart.getTotalDiscountPrice());
         // Lấy thông tin sách trong giỏ hàng
-        cartPreviewResponse.setCartItems(cart.getCartItems().stream().map(cartItem -> new CartItemResponse(
-                cartItem.getId(),
-                cartItem.getQuantity(),
-                cartItem.getOriginalPrice(),
-                cartItem.getDiscountPrice(),
-                cartItem.getFinalPrice(),
-                cartItem.getSelected(),
-                new CartItemResponse.BookResponse(
-                        cartItem.getBook().getId(),
-                        cartItem.getBook().getTitle(),
-                        cartItem.getBook().getImageURL(),
-                        cartItem.getBook().getOfficial(),
-                        cartItem.getBook().getOriginalPrice(),
-                        cartItem.getBook().getDiscountPercentage(),
-                        cartItem.getBook().getFinalPrice())))
-                .toList());
+        List<CartItem> cartItems = this.cartItemRepository.findByCart(cart);
+        List<CartItemResponse> cartItemResponses = cartItems.stream()
+                .map(cartItem -> this.cartItemService.convertToCartItemResponse(cartItem))
+                .toList();
+        cartPreviewResponse.setCartItems(cartItemResponses);
         return cartPreviewResponse;
+    }
+
+    public CartPaymentResponse convertToCartPaymentResponse(Cart cart) {
+        List<CartItem> selectedItems = this.getSelectedItems(cart);
+        Integer totalQuantity = selectedItems.stream().mapToInt(CartItem::getQuantity).sum();
+        CartPaymentResponse cartPaymentResponse = new CartPaymentResponse();
+        cartPaymentResponse.setId(cart.getId());
+        cartPaymentResponse.setTotalQuantity(totalQuantity);
+        cartPaymentResponse.setTotalOriginalPrice(cart.getTotalOriginalPrice());
+        cartPaymentResponse.setTotalDiscountPrice(cart.getTotalDiscountPrice());
+        cartPaymentResponse.setTotalFinalPrice(cart.getTotalFinalPrice());
+        // Lấy thông tin sách trong giỏ hàng
+        List<CartItemPaymentResponse> cartItemPaymentResponses = selectedItems.stream()
+                .map(cartItem -> this.cartItemService.convertToCartItemPaymentResponse(cartItem))
+                .toList();
+        cartPaymentResponse.setCartItems(cartItemPaymentResponses);
+        return cartPaymentResponse;
     }
 
     // Lấy tất cả sản phẩm được chọn trong giỏ hàng
