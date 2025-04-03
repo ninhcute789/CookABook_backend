@@ -77,7 +77,6 @@ public class CartItemService {
                 cartItem.getDiscountPrice(),
                 cartItem.getFinalPrice(),
                 cartItem.getSelected(),
-                new CartItemResponse.Cart(cartItem.getCart().getId()),
                 new CartItemResponse.BookResponse(
                         cartItem.getBook().getId(),
                         cartItem.getBook().getTitle(),

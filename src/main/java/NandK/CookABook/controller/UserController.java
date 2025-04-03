@@ -13,6 +13,7 @@ import NandK.CookABook.dto.response.user.UserUpdateResponse;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.ArticleService;
+import NandK.CookABook.service.OrderService;
 import NandK.CookABook.service.UserService;
 import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
@@ -38,11 +39,14 @@ public class UserController {
 
     private final UserService userService;
     private final ArticleService articleService;
+    private final OrderService orderService;
     private final PasswordEncoder passwordEncoder;
 
-    public UserController(UserService userService, ArticleService articleService, PasswordEncoder passwordEncoder) {
+    public UserController(UserService userService, ArticleService articleService,
+            OrderService orderService, PasswordEncoder passwordEncoder) {
         this.userService = userService;
         this.articleService = articleService;
+        this.orderService = orderService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -79,6 +83,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(this.articleService.getAllArticlesByUser(user, pageable));
     }
 
+    @GetMapping("/{userId}/orders")
+    @ApiMessage("Lấy danh sách đơn hàng theo userId thành công")
+    public ResponseEntity<ResultPagination> getOrdersByUserId(
+            @PathVariable Long userId, Pageable pageable) throws IdInvalidException {
+        User user = this.userService.getUserById(userId);
+        if (user == null) {
+            throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(this.orderService.getAllOrdersByUser(user, pageable));
+    }
+
     @GetMapping("/{userId}")
     @ApiMessage("Lấy người dùng thành công")
     public ResponseEntity<UserFoundResponse> getUserById(@PathVariable Long userId)
@@ -88,21 +103,6 @@ public class UserController {
             throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
         }
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserFindByIdResponse(user));
-    }
-
-    @GetMapping("/{userId}/avatar")
-    @ApiMessage("Lấy avatar người dùng thành công")
-    public ResponseEntity<String> getUserAvatar(@PathVariable Long userId) throws IdInvalidException {
-        User user = this.userService.getUserById(userId);
-        if (user == null) {
-            throw new IdInvalidException("User với Id = " + userId + " không tồn tại");
-        }
-        String avatar = this.userService.getUserAvatar(user);
-        if (avatar == null) {
-            return ResponseEntity.status(HttpStatus.OK).body("");
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body(avatar);
-        }
     }
 
     @PutMapping

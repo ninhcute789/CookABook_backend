@@ -61,11 +61,10 @@ public class ShippingAddressService {
         shippingAddressResponse.setWard(shippingAddress.getWard());
         shippingAddressResponse.setAddress(shippingAddress.getAddress());
         shippingAddressResponse.setDefaultAddress(shippingAddress.getDefaultAddress());
-        shippingAddressResponse.setUserId(shippingAddress.getUser().getId());
         return shippingAddressResponse;
     }
 
-    public List<ShippingAddressResponse> getShippingAddressesByUser(User user) {
+    public List<ShippingAddressResponse> getAllShippingAddressesByUser(User user) {
         List<ShippingAddress> shippingAddresses = this.shippingAddressRepository.findByUser(user);
         List<ShippingAddressResponse> shippingAddressResponses = new ArrayList<>();
         for (ShippingAddress shippingAddress : shippingAddresses) {
@@ -93,7 +92,6 @@ public class ShippingAddressService {
         }
     }
 
-    // TODO: add defaultAress
     public ShippingAddress updateShippingAddress(ShippingAddressUpdateRequest request) {
         ShippingAddress shippingAddress = this.getShippingAddressById(request.getId());
         if (shippingAddress != null) {

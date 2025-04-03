@@ -11,10 +11,8 @@ public class PaymentCreationRequest {
     @NotNull(message = "Phương thức thanh toán không được để trống")
     private PaymentMethodEnum method;
 
-    private String amount;
-
-    @NotNull(message = "Id đơn hàng không được để trống")
-    private Long orderId;
+    @NotNull(message = "Số tiền không được để trống")
+    private Integer amount;
 
     @NotNull(message = "Id người dùng không được để trống")
     private Long userId;

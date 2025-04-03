@@ -7,20 +7,13 @@ import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class OrderItemResponse {
     private Long id;
     private Integer quantity;
     private Integer price;
-    private Order order;
     private BookResponse book;
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Order {
-        private Long id;
-    }
 
     @Getter
     @Setter
@@ -28,8 +21,8 @@ public class OrderItemResponse {
     @NoArgsConstructor
     public static class BookResponse {
         private Long bookId;
-        private String bookName;
-        private String bookImage;
-        private Integer bookPrice;
+        private String bookTitle;
+        private String bookImageURL;
+        private Integer bookFinalPrice;
     }
 }

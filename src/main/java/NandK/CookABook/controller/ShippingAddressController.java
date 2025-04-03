@@ -74,7 +74,7 @@ public class ShippingAddressController {
         if (user == null) {
             throw new IdInvalidException("Id người dùng = " + userId + " không hợp lệ");
         }
-        return ResponseEntity.ok(this.shippingAddressService.getShippingAddressesByUser(user));
+        return ResponseEntity.ok(this.shippingAddressService.getAllShippingAddressesByUser(user));
     }
 
     @GetMapping("/default-by-user-id/{userId}")
