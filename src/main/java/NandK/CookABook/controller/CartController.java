@@ -68,12 +68,12 @@ public class CartController {
 
     @DeleteMapping("{cartId}")
     @ApiMessage("Xóa tất cả sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<Void> deleteAllCartItems(@PathVariable Long cartId) throws IdInvalidException {
+    public ResponseEntity<String> deleteAllCartItems(@PathVariable Long cartId) throws IdInvalidException {
         Cart cart = this.cartService.getCartById(cartId);
         if (cart == null) {
             throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
         }
         this.cartService.deleteAllCartItems(cart);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok("Xóa tất cả sản phẩm trong giỏ hàng thành công");
     }
 }

@@ -14,5 +14,4 @@ public class ShippingAddressResponse {
     private String ward;
     private String address;
     private Boolean defaultAddress;
-    private Long userId;
 }

@@ -70,7 +70,6 @@ public class ArticleService {
         meta.setSize(pageable.getPageSize());
         meta.setTotalPages(articles.getTotalPages());
         meta.setTotalElements(articles.getTotalElements());
-
         result.setMeta(meta);
 
         List<ArticleFoundResponse> listArticles = this.convertToArticlesFoundResponse(articles.getContent());

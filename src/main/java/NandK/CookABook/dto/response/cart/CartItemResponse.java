@@ -16,16 +16,7 @@ public class CartItemResponse {
     private Integer discountPrice;
     private Integer finalPrice;
     private Boolean selected;
-    private Cart cart;
     private BookResponse book;
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class Cart {
-        private Long id;
-    }
 
     @Getter
     @Setter
