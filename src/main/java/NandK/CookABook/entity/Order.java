@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import NandK.CookABook.utils.constant.OrderStatusEnum;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -35,9 +36,10 @@ public class Order {
     private Long id;
 
     private Integer totalQuantity;
-    private Integer totalPrice;
+    private Integer totalFinalPrice;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private OrderStatusEnum status;
 
     @ManyToOne
@@ -48,10 +50,10 @@ public class Order {
     @JsonIgnore
     private List<OrderItem> orderItems;
 
-    @OneToOne
+    @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "payment_id")
-    @JsonIgnore
-    private Payment payments;
+    // @JsonIgnore
+    private Payment payment;
 
     @ManyToOne
     @JoinColumn(name = "shipping_address_id")

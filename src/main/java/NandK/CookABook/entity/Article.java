@@ -54,6 +54,7 @@ public class Article {
                 SecurityUtil.getCurrentUserLogin().isPresent() ? SecurityUtil.getCurrentUserLogin().get()
                         : "anonymous");
         this.setCreatedAt(Instant.now());
+        this.setUpdatedAt(Instant.now());
     }
 
     @PreUpdate

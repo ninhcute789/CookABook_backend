@@ -1,5 +1,7 @@
 package NandK.CookABook.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.domain.Page;
@@ -7,10 +9,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import NandK.CookABook.dto.request.payment.PaymentUpdateRequest;
+import NandK.CookABook.dto.request.payment.PaymentCreationRequest;
+import NandK.CookABook.dto.request.payment.PaymentStatusUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.payment.PaymentCreationResponse;
+import NandK.CookABook.dto.response.payment.PaymentFoundResponse;
+import NandK.CookABook.dto.response.payment.PaymentUpdateResponse;
 import NandK.CookABook.entity.Payment;
+import NandK.CookABook.entity.User;
 import NandK.CookABook.repository.PaymentRepository;
+import NandK.CookABook.utils.constant.PaymentStatusEnum;
 
 @Service
 public class PaymentService {
@@ -21,11 +29,25 @@ public class PaymentService {
         this.paymentRepository = paymentRepository;
     }
 
-    public Payment createPayment() {
-        return null;
+    public Payment createPayment(PaymentCreationRequest request, User user) {
+        Payment payment = new Payment();
+        payment.setMethod(request.getMethod());
+        payment.setAmount(request.getAmount());
+        payment.setStatus(PaymentStatusEnum.PENDING);
+        payment.setUser(user);
+        return this.paymentRepository.save(payment);
     }
 
-    // TODO: add method convertToPaymentResponse
+    public PaymentCreationResponse convertToPaymentCreationResponse(Payment payment) {
+        PaymentCreationResponse response = new PaymentCreationResponse(
+                payment.getId(),
+                payment.getAmount(),
+                payment.getMethod(),
+                payment.getStatus(),
+                payment.getCreatedAt(),
+                payment.getUser().getId());
+        return response;
+    }
 
     public ResultPagination getAllPayments(Specification<Payment> spec, Pageable pageable) {
         Page<Payment> payments = this.paymentRepository.findAll(spec, pageable);
@@ -38,8 +60,26 @@ public class PaymentService {
         meta.setTotalElements(payments.getTotalElements());
         result.setMeta(meta);
 
-        result.setData(payments.getContent());
+        List<PaymentFoundResponse> paymentResponses = new ArrayList<>();
+        for (Payment payment : payments) {
+            PaymentFoundResponse paymentResponse = this.convertToPaymentFoundResponse(payment);
+            paymentResponses.add(paymentResponse);
+        }
+        result.setData(paymentResponses);
         return result;
+    }
+
+    public PaymentFoundResponse convertToPaymentFoundResponse(Payment payment) {
+        PaymentFoundResponse response = new PaymentFoundResponse(
+                payment.getId(),
+                payment.getAmount(),
+                payment.getMethod(),
+                payment.getStatus(),
+                payment.getCreatedAt(),
+                payment.getUpdatedAt(),
+                payment.getOrder().getId(),
+                payment.getUser().getId());
+        return response;
     }
 
     public Payment getPaymentById(Long paymentId) {
@@ -51,7 +91,7 @@ public class PaymentService {
         }
     }
 
-    public Payment updatePaymentStatus(PaymentUpdateRequest request) {
+    public Payment updatePaymentStatus(PaymentStatusUpdateRequest request) {
         Payment payment = this.getPaymentById(request.getId());
         if (payment != null) {
             if (request.getStatus() != null) {
@@ -61,5 +101,19 @@ public class PaymentService {
         } else {
             return null;
         }
+    }
+
+    public PaymentUpdateResponse convertToPaymentUpdateResponse(Payment payment) {
+        PaymentUpdateResponse response = new PaymentUpdateResponse(
+                payment.getId(),
+                payment.getAmount(),
+                payment.getMethod(),
+                payment.getStatus(),
+                payment.getCreatedAt());
+        return response;
+    }
+
+    public void deletePayment(Payment payment) {
+        this.paymentRepository.delete(payment);
     }
 }

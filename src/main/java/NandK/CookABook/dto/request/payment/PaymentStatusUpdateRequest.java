@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PaymentUpdateRequest {
+public class PaymentStatusUpdateRequest {
     @NotNull(message = "Id thanh toán không được để trống")
     private Long id;
 

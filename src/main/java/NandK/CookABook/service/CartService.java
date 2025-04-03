@@ -114,8 +114,6 @@ public class CartService {
                 cartItem.getDiscountPrice(),
                 cartItem.getFinalPrice(),
                 cartItem.getSelected(),
-                new CartItemResponse.Cart(
-                        cartItem.getCart().getId()),
                 new CartItemResponse.BookResponse(
                         cartItem.getBook().getId(),
                         cartItem.getBook().getTitle(),
@@ -128,18 +126,47 @@ public class CartService {
         return cartPreviewResponse;
     }
 
+    // Lấy tất cả sản phẩm được chọn trong giỏ hàng
+    public List<CartItem> getSelectedItems(Cart cart) {
+        return this.cartItemRepository.findByCartAndSelected(cart, true);
+    }
+
+    // Xóa tất cả sản phẩm được chọn trong giỏ hàng
+    public void deleteSelectedItems(List<CartItem> cartItems) {
+        for (CartItem cartItem : cartItems) {
+            this.cartItemRepository.delete(cartItem);
+        }
+    }
+
     // Tính tổng tiền giỏ hàng chỉ cho những sản phẩm được chọn
     public void calculateCartPrice(Cart cart) {
-        List<CartItem> cartItems = this.cartItemRepository.findByCart(cart);
+        List<CartItem> cartItems = this.getSelectedItems(cart);
         if (cartItems != null) {
             for (CartItem cartItem : cartItems) {
-                if (cartItem.getSelected()) {
-                    cart.setTotalOriginalPrice(cart.getTotalOriginalPrice() + cartItem.getOriginalPrice());
-                    cart.setTotalDiscountPrice(cart.getTotalDiscountPrice() + cartItem.getDiscountPrice());
-                    cart.setTotalFinalPrice(cart.getTotalFinalPrice() + cartItem.getFinalPrice());
-                }
+                cart.setTotalOriginalPrice(cart.getTotalOriginalPrice() + cartItem.getOriginalPrice());
+                cart.setTotalDiscountPrice(cart.getTotalDiscountPrice() + cartItem.getDiscountPrice());
+                cart.setTotalFinalPrice(cart.getTotalFinalPrice() + cartItem.getFinalPrice());
             }
         }
+    }
+
+    public void resetCartToZero(Cart cart) {
+        cart.setTotalQuantity(0);
+        cart.setTotalOriginalPrice(0);
+        cart.setTotalDiscountPrice(0);
+        cart.setTotalFinalPrice(0);
+        this.cartRepository.save(cart);
+    }
+
+    // Lưu thông tin giỏ hàng
+    public void saveCart(Cart cart) {
+        // Tính toán lại tổng tiền giỏ hàng
+        cart.setTotalOriginalPrice(0);
+        cart.setTotalDiscountPrice(0);
+        cart.setTotalFinalPrice(0);
+        this.calculateCartPrice(cart);
+        // Lưu thông tin giỏ hàng
+        this.cartRepository.save(cart);
     }
 
     // Xóa tất cả sản phẩm trong giỏ hàng
