@@ -54,13 +54,8 @@ public class CartService {
     }
 
     // Lấy số lượng sản phẩm trong giỏ hàng để hiển thị trên giỏ hàng
-    public Integer getTotalQuantityById(Long cartId) {
-        Cart cart = this.getCartById(cartId);
-        if (cart != null) {
-            return cart.getTotalQuantity();
-        } else {
-            return null;
-        }
+    public Integer getCartSize(Cart cart) {
+        return cart.getCartItems().size();
     }
 
     // Thêm sách vào giỏ hàng hoặc cập nhật số lượng
@@ -149,6 +144,10 @@ public class CartService {
 
     // Tính tổng tiền giỏ hàng chỉ cho những sản phẩm được chọn
     public void calculateCartPrice(Cart cart) {
+        // Reset tổng tiền giỏ hàng
+        cart.setTotalOriginalPrice(0);
+        cart.setTotalDiscountPrice(0);
+        cart.setTotalFinalPrice(0);
         List<CartItem> cartItems = this.getSelectedItems(cart);
         if (cartItems != null) {
             for (CartItem cartItem : cartItems) {
