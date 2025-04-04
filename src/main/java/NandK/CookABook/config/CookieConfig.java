@@ -12,7 +12,8 @@ public class CookieConfig {
         DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setCookieName("JSESSIONID"); // Đặt tên cookie là JSESSIONID
         serializer.setCookiePath("/"); // Đặt đường dẫn cookie
-        serializer.setSameSite("Lax"); // Chỉ định SameSite=Lax cho các yêu cầu không cross-origin
+        serializer.setSameSite("None"); // Cho phép gửi cookie trong các yêu cầu cross-origin
+        serializer.setUseSecureCookie(true);
         return serializer;
     }
 }
