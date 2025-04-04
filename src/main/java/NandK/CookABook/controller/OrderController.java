@@ -116,8 +116,37 @@ public class OrderController {
         if (paymentFromSession == null) {
             throw new IdInvalidException("Thông tin thanh toán chưa được lưu");
         }
-        Order order = this.orderService.createOrder(user, cartFromSession, shippingAddressFromSession,
-                paymentFromSession);
+        Cart cart = this.cartService.getCartById(cartFromSession.getId());
+        if (cart == null) {
+            throw new IdInvalidException("Giỏ hàng với id = " + cartFromSession.getId() + " không tồn tại");
+        }
+        if (cart.getTotalQuantity() == 0) {
+            throw new IdInvalidException(
+                    "Giỏ hàng với id = " + cartFromSession.getId() + " không có sản phẩm nào được chọn");
+        }
+        ShippingAddress shippingAddress = this.shippingAddressService
+                .getShippingAddressById(shippingAddressFromSession.getId());
+        if (shippingAddress == null) {
+            throw new IdInvalidException(
+                    "Địa chỉ giao hàng với id = " + shippingAddressFromSession.getId() + " không tồn tại");
+        }
+        if (shippingAddress.getUser() == null) {
+            throw new IdInvalidException("Địa chỉ giao hàng với id = " + shippingAddressFromSession.getId()
+                    + " không thuộc về người dùng nào");
+        }
+        Payment payment = this.paymentService.getPaymentById(paymentFromSession.getId());
+        if (payment == null) {
+            throw new IdInvalidException(
+                    "Thông tin thanh toán với id = " + paymentFromSession.getId() + " không tồn tại");
+        }
+        if (payment.getOrder() != null) {
+            throw new IdInvalidException("Thông tin thanh toán với id = " + paymentFromSession.getId()
+                    + " đã được sử dụng cho đơn hàng khác");
+        }
+        Order order = this.orderService.createOrder(user, cart, shippingAddress, payment);
+        session.removeAttribute("cart"); // Xoá giỏ hàng trong session sau khi tạo đơn hàng
+        session.removeAttribute("shippingAddress"); // Xoá địa chỉ giao hàng trong session sau khi tạo đơn hàng
+        session.removeAttribute("payment"); // Xoá thông tin thanh toán trong session sau khi tạo đơn hàng
         return ResponseEntity.ok(this.orderService.convertToOrderPreviewResponse(order));
     }
 

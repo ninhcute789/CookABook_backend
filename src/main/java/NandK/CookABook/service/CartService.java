@@ -1,7 +1,9 @@
 package NandK.CookABook.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -106,9 +108,12 @@ public class CartService {
         cartPreviewResponse.setTotalDiscountPrice(cart.getTotalDiscountPrice());
         // Lấy thông tin sách trong giỏ hàng
         List<CartItem> cartItems = this.cartItemRepository.findByCart(cart);
+        if (cartItems == null) {
+            cartItems = new ArrayList<>(); // Nếu không có sản phẩm trong giỏ, khởi tạo một danh sách trống
+        }
         List<CartItemResponse> cartItemResponses = cartItems.stream()
                 .map(cartItem -> this.cartItemService.convertToCartItemResponse(cartItem))
-                .toList();
+                .collect(Collectors.toList());
         cartPreviewResponse.setCartItems(cartItemResponses);
         return cartPreviewResponse;
     }
@@ -125,7 +130,7 @@ public class CartService {
         // Lấy thông tin sách trong giỏ hàng
         List<CartItemPaymentResponse> cartItemPaymentResponses = selectedItems.stream()
                 .map(cartItem -> this.cartItemService.convertToCartItemPaymentResponse(cartItem))
-                .toList();
+                .collect(Collectors.toList());
         cartPaymentResponse.setCartItems(cartItemPaymentResponses);
         return cartPaymentResponse;
     }
