@@ -1,5 +1,8 @@
 package NandK.CookABook.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.ResponseEntity;
@@ -94,6 +97,22 @@ public class OrderController {
         session.removeAttribute("paymentMethod"); // Xoá thông tin thanh toán cũ trong session nếu có
         session.setAttribute("payment", payment); // Lưu thông tin thanh toán vào session
         return ResponseEntity.ok(null);
+    }
+
+    @GetMapping("/session")
+    @ApiMessage("Lấy thông tin session thành công")
+    public ResponseEntity<Map<String, Object>> getSessionInfo() {
+        Map<String, Object> sessionInfo = new HashMap<>();
+
+        Cart cart = (Cart) session.getAttribute("cart");
+        ShippingAddress shippingAddress = (ShippingAddress) session.getAttribute("shippingAddress");
+        Payment payment = (Payment) session.getAttribute("payment");
+
+        sessionInfo.put("cart", cart);
+        sessionInfo.put("shippingAddress", shippingAddress);
+        sessionInfo.put("payment", payment);
+
+        return ResponseEntity.ok(sessionInfo);
     }
 
     @PostMapping
