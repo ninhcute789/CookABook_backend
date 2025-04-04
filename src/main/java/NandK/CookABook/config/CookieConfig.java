@@ -14,6 +14,7 @@ public class CookieConfig {
         serializer.setCookiePath("/"); // Đặt đường dẫn cookie
         serializer.setSameSite("None"); // Cho phép gửi cookie trong các yêu cầu cross-origin
         serializer.setUseSecureCookie(true);
+        serializer.setUseHttpOnlyCookie(true); // Chỉ cho phép cookie được truy cập qua HTTP, không qua JavaScript
         return serializer;
     }
 }
