@@ -34,12 +34,12 @@ public class CartController {
 
     @GetMapping("/{cartId}/quantity")
     @ApiMessage("Lấy số lượng sản phẩm trong giỏ hàng thành công")
-    public ResponseEntity<Integer> getTotalQuantityById(@PathVariable Long cartId) throws IdInvalidException {
-        Integer totalQuantity = this.cartService.getTotalQuantityById(cartId);
-        if (totalQuantity == null) {
+    public ResponseEntity<Integer> getCartSizeById(@PathVariable Long cartId) throws IdInvalidException {
+        Cart cart = this.cartService.getCartById(cartId);
+        if (cart == null) {
             throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không hợp lệ");
         }
-        return ResponseEntity.ok(totalQuantity);
+        return ResponseEntity.ok(this.cartService.getCartSize(cart));
     }
 
     @GetMapping("{cartId}")

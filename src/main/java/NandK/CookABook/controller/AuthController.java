@@ -100,6 +100,8 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from("refresh-token", refreshToken)
                 .httpOnly(true)
+                .secure(true) // chỉ gửi cookie qua HTTPS
+                .sameSite("None") // cho phép gửi cookie trong các yêu cầu cross-origin
                 .path("/")
                 .maxAge(refreshTokenExpiration)
                 .build();
@@ -166,6 +168,8 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from("refresh-token", newRefreshToken)
                 .httpOnly(true)
+                .secure(true) // chỉ gửi cookie qua HTTPS
+                .sameSite("None") // cho phép gửi cookie trong các yêu cầu cross-origin
                 .path("/")
                 .maxAge(refreshTokenExpiration)
                 .build();
@@ -189,6 +193,8 @@ public class AuthController {
         ResponseCookie cookie = ResponseCookie
                 .from("refresh-token", "")
                 .httpOnly(true)
+                .secure(true) // chỉ gửi cookie qua HTTPS
+                .sameSite("None") // cho phép gửi cookie trong các yêu cầu cross-origin
                 .path("/")
                 .maxAge(0)
                 .build();
