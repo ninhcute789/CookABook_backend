@@ -91,6 +91,11 @@
 			<artifactId>jpa</artifactId>
 			<version>3.1.9</version>
 		</dependency>
+		<!-- Spring Boot Session -->
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-core</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
