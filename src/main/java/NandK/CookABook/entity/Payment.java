@@ -3,6 +3,7 @@ package NandK.CookABook.entity;
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import NandK.CookABook.utils.constant.PaymentMethodEnum;
 import NandK.CookABook.utils.constant.PaymentStatusEnum;
@@ -40,10 +41,12 @@ public class Payment {
 
     @OneToOne
     @JoinColumn(name = "order_id")
+    @JsonIgnore
     private Order order;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
