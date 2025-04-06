@@ -30,7 +30,7 @@ public class OrderFoundResponse {
     private Long userId;
     private ShippingAddress shippingAddress;
     private Payment payment;
-    private List<OrderItemResponse> orderItems;
+    private List<OrderItemFoundResponse> orderItems;
 
     @Getter
     @Setter

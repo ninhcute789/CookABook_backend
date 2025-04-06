@@ -1,6 +1,8 @@
 package NandK.CookABook.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Pageable;
@@ -17,17 +19,22 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
+import NandK.CookABook.dto.request.cart.AddToCartRequest;
 import NandK.CookABook.dto.request.order.OrderCreationFromUserIdRequest;
 import NandK.CookABook.dto.request.order.OrderStatusUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.cart.CartItemResponse;
 import NandK.CookABook.dto.response.order.OrderFoundResponse;
 import NandK.CookABook.dto.response.order.OrderPreviewResponse;
 import NandK.CookABook.entity.Cart;
+import NandK.CookABook.entity.CartItem;
 import NandK.CookABook.entity.Order;
+import NandK.CookABook.entity.OrderItem;
 import NandK.CookABook.entity.Payment;
 import NandK.CookABook.entity.ShippingAddress;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
+import NandK.CookABook.service.CartItemService;
 import NandK.CookABook.service.CartService;
 import NandK.CookABook.service.OrderService;
 import NandK.CookABook.service.PaymentService;
@@ -46,22 +53,25 @@ public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
     private final CartService cartService;
+    private final CartItemService cartItemService;
     private final ShippingAddressService shippingAddressService;
     private final PaymentService paymentService;
 
     public OrderController(HttpSession session, OrderService orderService, UserService userService,
-            CartService cartService, ShippingAddressService shippingAddressService, PaymentService paymentService) {
+            CartService cartService, CartItemService cartItemService,
+            ShippingAddressService shippingAddressService, PaymentService paymentService) {
         this.session = session;
         this.orderService = orderService;
         this.userService = userService;
         this.cartService = cartService;
+        this.cartItemService = cartItemService;
         this.shippingAddressService = shippingAddressService;
         this.paymentService = paymentService;
     }
 
     @PostMapping("/save-cart-to-session/{cartId}")
     @ApiMessage("Lưu giỏ hàng thành công")
-    public ResponseEntity<Void> saveCart(@PathVariable Long cartId) throws IdInvalidException {
+    public ResponseEntity<Cart> saveCart(@PathVariable Long cartId) throws IdInvalidException {
         Cart cart = this.cartService.getCartById(cartId);
         if (cart == null) {
             throw new IdInvalidException("Giỏ hàng với id = " + cartId + " không tồn tại");
@@ -72,31 +82,36 @@ public class OrderController {
         session.removeAttribute("cart"); // Xoá giỏ hàng cũ trong session nếu có
         session.setAttribute("cart", cart); // Lưu giỏ hàng vào session
         this.cartService.saveCart(cart);
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok((Cart) session.getAttribute("cart"));
     }
 
     @PostMapping("/save-shipping-address-to-session/{shippingAddressId}")
     @ApiMessage("Lưu địa chỉ giao hàng thành công")
-    public ResponseEntity<Void> saveShippingAddress(@PathVariable Long shippingAddressId) throws IdInvalidException {
+    public ResponseEntity<ShippingAddress> saveShippingAddress(@PathVariable Long shippingAddressId)
+            throws IdInvalidException {
         ShippingAddress shippingAddress = this.shippingAddressService.getShippingAddressById(shippingAddressId);
         if (shippingAddress == null) {
             throw new IdInvalidException("Địa chỉ giao hàng với id = " + shippingAddressId + " không tồn tại");
         }
         session.removeAttribute("shippingAddress"); // Xoá địa chỉ giao hàng cũ trong session nếu có
         session.setAttribute("shippingAddress", shippingAddress); // Lưu địa chỉ giao hàng vào session
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok((ShippingAddress) session.getAttribute("shippingAddress"));
     }
 
     @PostMapping("/save-payment-to-session/{paymentId}")
     @ApiMessage("Lưu thông tin thanh toán thành công")
-    public ResponseEntity<Void> savePayment(@PathVariable Long paymentId) throws IdInvalidException {
+    public ResponseEntity<Payment> savePayment(@PathVariable Long paymentId) throws IdInvalidException {
         Payment payment = this.paymentService.getPaymentById(paymentId);
         if (payment == null) {
             throw new IdInvalidException("Thông tin thanh toán với id = " + paymentId + " không tồn tại");
         }
+        if (payment.getOrder() != null) {
+            throw new IdInvalidException("Thông tin thanh toán với id = " + paymentId
+                    + " đã được sử dụng cho đơn hàng khác");
+        }
         session.removeAttribute("paymentMethod"); // Xoá thông tin thanh toán cũ trong session nếu có
         session.setAttribute("payment", payment); // Lưu thông tin thanh toán vào session
-        return ResponseEntity.ok(null);
+        return ResponseEntity.ok((Payment) session.getAttribute("payment"));
     }
 
     @GetMapping("/session")
@@ -135,34 +150,8 @@ public class OrderController {
         if (paymentFromSession == null) {
             throw new IdInvalidException("Thông tin thanh toán chưa được lưu");
         }
-        Cart cart = this.cartService.getCartById(cartFromSession.getId());
-        if (cart == null) {
-            throw new IdInvalidException("Giỏ hàng với id = " + cartFromSession.getId() + " không tồn tại");
-        }
-        if (cart.getTotalQuantity() == 0) {
-            throw new IdInvalidException(
-                    "Giỏ hàng với id = " + cartFromSession.getId() + " không có sản phẩm nào được chọn");
-        }
-        ShippingAddress shippingAddress = this.shippingAddressService
-                .getShippingAddressById(shippingAddressFromSession.getId());
-        if (shippingAddress == null) {
-            throw new IdInvalidException(
-                    "Địa chỉ giao hàng với id = " + shippingAddressFromSession.getId() + " không tồn tại");
-        }
-        if (shippingAddress.getUser() == null) {
-            throw new IdInvalidException("Địa chỉ giao hàng với id = " + shippingAddressFromSession.getId()
-                    + " không thuộc về người dùng nào");
-        }
-        Payment payment = this.paymentService.getPaymentById(paymentFromSession.getId());
-        if (payment == null) {
-            throw new IdInvalidException(
-                    "Thông tin thanh toán với id = " + paymentFromSession.getId() + " không tồn tại");
-        }
-        if (payment.getOrder() != null) {
-            throw new IdInvalidException("Thông tin thanh toán với id = " + paymentFromSession.getId()
-                    + " đã được sử dụng cho đơn hàng khác");
-        }
-        Order order = this.orderService.createOrder(user, cart, shippingAddress, payment);
+        Order order = this.orderService.createOrder(user, cartFromSession, shippingAddressFromSession,
+                paymentFromSession);
         session.removeAttribute("cart"); // Xoá giỏ hàng trong session sau khi tạo đơn hàng
         session.removeAttribute("shippingAddress"); // Xoá địa chỉ giao hàng trong session sau khi tạo đơn hàng
         session.removeAttribute("payment"); // Xoá thông tin thanh toán trong session sau khi tạo đơn hàng
@@ -208,6 +197,31 @@ public class OrderController {
         }
         this.orderService.cancelOrder(order);
         return ResponseEntity.ok("Đơn hàng với id = " + orderId + " đã được huỷ thành công");
+    }
+
+    @PostMapping("/{orderId}/reorder")
+    @ApiMessage("Thêm các sản phẩm trong đơn hàng vào giỏ hàng thành công")
+    public ResponseEntity<List<CartItemResponse>> reorderByOrderId(@PathVariable Long orderId)
+            throws IdInvalidException {
+        Order order = this.orderService.getOrderById(orderId);
+        if (order == null) {
+            throw new IdInvalidException("Đơn hàng với id = " + orderId + " không tồn tại");
+        }
+        List<CartItemResponse> cartItemResponses = new ArrayList<>();
+        List<OrderItem> orderItems = order.getOrderItems();
+        for (OrderItem orderItem : orderItems) {
+            AddToCartRequest addToCartRequest = new AddToCartRequest(order.getUser().getCart().getId(),
+                    orderItem.getBook().getId(), orderItem.getQuantity());
+            CartItem cartItem = this.cartService.addToCart(addToCartRequest);
+            if (cartItem == null) {
+                throw new IdInvalidException(
+                        "Giỏ hàng với id = " + order.getUser().getCart().getId() + " hoặc sách với id = "
+                                + orderItem.getBook().getId() + " không hợp lệ");
+            }
+            this.cartItemService.updateCartItemSelection(cartItem);
+            cartItemResponses.add(this.cartItemService.convertToCartItemResponse(cartItem));
+        }
+        return ResponseEntity.ok(cartItemResponses);
     }
 
     @DeleteMapping("/{orderId}")

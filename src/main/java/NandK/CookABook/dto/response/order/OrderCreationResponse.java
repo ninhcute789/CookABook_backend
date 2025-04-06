@@ -17,5 +17,5 @@ public class OrderCreationResponse {
     private Integer totalQuantity;
     private Integer totalFinalPrice;
     private OrderStatusEnum status;
-    private List<OrderItemResponse> orderItems;
+    private List<OrderItemPreviewResponse> orderItems;
 }

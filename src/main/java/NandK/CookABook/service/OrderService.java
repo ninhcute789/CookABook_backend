@@ -12,7 +12,8 @@ import org.springframework.stereotype.Service;
 import NandK.CookABook.dto.request.order.OrderStatusUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.dto.response.order.OrderFoundResponse;
-import NandK.CookABook.dto.response.order.OrderItemResponse;
+import NandK.CookABook.dto.response.order.OrderItemFoundResponse;
+import NandK.CookABook.dto.response.order.OrderItemPreviewResponse;
 import NandK.CookABook.dto.response.order.OrderPreviewResponse;
 import NandK.CookABook.entity.Cart;
 import NandK.CookABook.entity.CartItem;
@@ -120,8 +121,8 @@ public class OrderService {
         orderPreviewResponse.setUpdatedAt(order.getUpdatedAt());
 
         List<OrderItem> orderItems = order.getOrderItems();
-        List<OrderItemResponse> orderItemResponses = this.orderItemService
-                .convertToOrderItemResponse(orderItems);
+        List<OrderItemPreviewResponse> orderItemResponses = this.orderItemService
+                .convertToOrderItemPreviewResponse(orderItems);
         orderPreviewResponse.setOrderItems(orderItemResponses);
 
         return orderPreviewResponse;
@@ -162,8 +163,8 @@ public class OrderService {
         orderFoundResponse.setPayment(payment);
 
         List<OrderItem> orderItems = order.getOrderItems();
-        List<OrderItemResponse> orderItemResponses = this.orderItemService
-                .convertToOrderItemResponse(orderItems);
+        List<OrderItemFoundResponse> orderItemResponses = this.orderItemService
+                .convertToOrderItemFoundResponse(orderItems);
         orderFoundResponse.setOrderItems(orderItemResponses);
 
         return orderFoundResponse;

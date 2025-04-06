@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class OrderItemResponse {
+public class OrderItemPreviewResponse {
     private Long id;
     private Integer quantity;
     private Integer price;
