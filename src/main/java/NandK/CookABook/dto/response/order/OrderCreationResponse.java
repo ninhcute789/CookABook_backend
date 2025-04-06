@@ -1,21 +1,55 @@
 package NandK.CookABook.dto.response.order;
 
+import java.time.Instant;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import NandK.CookABook.utils.constant.OrderStatusEnum;
+import NandK.CookABook.utils.constant.PaymentMethodEnum;
+import NandK.CookABook.utils.constant.PaymentStatusEnum;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class OrderCreationResponse {
     private Long id;
-    private String name;
-    private String address;
-    private String phoneNumber;
-    private String email;
     private Integer totalQuantity;
-    private Integer totalFinalPrice;
+    private Integer totalPrice;
     private OrderStatusEnum status;
-    private List<OrderItemPreviewResponse> orderItems;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+7")
+    private Instant createdAt;
+
+    private Long userId;
+    private ShippingAddress shippingAddress;
+    private Payment payment;
+    private List<OrderItemFoundResponse> orderItems;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class ShippingAddress {
+        private Long id;
+        private String name;
+        private String phoneNumber;
+        private String city;
+        private String district;
+        private String ward;
+        private String address;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class Payment {
+        private Long id;
+        private PaymentMethodEnum paymentMethod;
+        private PaymentStatusEnum paymentStatus;
+    }
 }

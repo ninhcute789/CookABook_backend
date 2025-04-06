@@ -1,11 +1,10 @@
-package NandK.CookABook.dto.response.payment;
+package NandK.CookABook.dto.response.order;
 
 import java.time.Instant;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-import NandK.CookABook.utils.constant.PaymentMethodEnum;
-import NandK.CookABook.utils.constant.PaymentStatusEnum;
+import NandK.CookABook.utils.constant.OrderStatusEnum;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,13 +14,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PaymentUpdateResponse {
+public class OrderStatusUpdateResponse {
     private Long id;
-    private Integer amount;
-    private PaymentMethodEnum method;
-    private PaymentStatusEnum status;
-    private Long orderId;
-    private Long userId;
+    private OrderStatusEnum status;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+7")
     private Instant updatedAt;
