@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 
 import NandK.CookABook.dto.request.order.OrderStatusUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.order.OrderCreationResponse;
 import NandK.CookABook.dto.response.order.OrderFoundResponse;
 import NandK.CookABook.dto.response.order.OrderItemFoundResponse;
 import NandK.CookABook.dto.response.order.OrderItemPreviewResponse;
 import NandK.CookABook.dto.response.order.OrderPreviewResponse;
+import NandK.CookABook.dto.response.order.OrderStatusUpdateResponse;
 import NandK.CookABook.entity.Cart;
 import NandK.CookABook.entity.CartItem;
 import NandK.CookABook.entity.Order;
@@ -71,6 +73,38 @@ public class OrderService {
         this.cartService.deleteSelectedItems(selectedItems);
         this.cartService.resetCartToZero(cart);
         return order;
+    }
+
+    public OrderCreationResponse convertToOrderCreationResponse(Order order) {
+        OrderCreationResponse orderCreationResponse = new OrderCreationResponse();
+        OrderCreationResponse.Payment payment = new OrderCreationResponse.Payment(
+                order.getPayment().getId(),
+                order.getPayment().getMethod(),
+                order.getPayment().getStatus());
+        OrderCreationResponse.ShippingAddress shippingAddress = new OrderCreationResponse.ShippingAddress(
+                order.getShippingAddress().getId(),
+                order.getShippingAddress().getName(),
+                order.getShippingAddress().getPhoneNumber(),
+                order.getShippingAddress().getCity(),
+                order.getShippingAddress().getDistrict(),
+                order.getShippingAddress().getWard(),
+                order.getShippingAddress().getAddress());
+
+        orderCreationResponse.setId(order.getId());
+        orderCreationResponse.setTotalQuantity(order.getTotalQuantity());
+        orderCreationResponse.setTotalPrice(order.getTotalFinalPrice());
+        orderCreationResponse.setStatus(order.getStatus());
+        orderCreationResponse.setCreatedAt(order.getCreatedAt());
+        orderCreationResponse.setUserId(order.getUser().getId());
+        orderCreationResponse.setShippingAddress(shippingAddress);
+        orderCreationResponse.setPayment(payment);
+
+        List<OrderItem> orderItems = order.getOrderItems();
+        List<OrderItemFoundResponse> orderItemResponses = this.orderItemService
+                .convertToOrderItemFoundResponse(orderItems);
+        orderCreationResponse.setOrderItems(orderItemResponses);
+
+        return orderCreationResponse;
     }
 
     public ResultPagination getAllOrdersByUser(User user, Pageable pageable) {
@@ -180,6 +214,14 @@ public class OrderService {
         } else {
             return null;
         }
+    }
+
+    public OrderStatusUpdateResponse convertToOrderStatusUpdateResponse(Order order) {
+        OrderStatusUpdateResponse response = new OrderStatusUpdateResponse(
+                order.getId(),
+                order.getStatus(),
+                order.getUpdatedAt());
+        return response;
     }
 
     public void cancelOrder(Order order) {

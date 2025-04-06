@@ -24,8 +24,9 @@ import NandK.CookABook.dto.request.order.OrderCreationFromUserIdRequest;
 import NandK.CookABook.dto.request.order.OrderStatusUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.dto.response.cart.CartItemResponse;
+import NandK.CookABook.dto.response.order.OrderCreationResponse;
 import NandK.CookABook.dto.response.order.OrderFoundResponse;
-import NandK.CookABook.dto.response.order.OrderPreviewResponse;
+import NandK.CookABook.dto.response.order.OrderStatusUpdateResponse;
 import NandK.CookABook.entity.Cart;
 import NandK.CookABook.entity.CartItem;
 import NandK.CookABook.entity.Order;
@@ -132,7 +133,7 @@ public class OrderController {
 
     @PostMapping
     @ApiMessage("Tạo đơn hàng thành công")
-    public ResponseEntity<OrderPreviewResponse> createOrderFromUserId(
+    public ResponseEntity<OrderCreationResponse> createOrderFromUserId(
             @Valid @RequestBody OrderCreationFromUserIdRequest request) throws IdInvalidException {
         User user = this.userService.getUserById(request.getUserId());
         if (user == null) {
@@ -152,10 +153,10 @@ public class OrderController {
         }
         Order order = this.orderService.createOrder(user, cartFromSession, shippingAddressFromSession,
                 paymentFromSession);
-        session.removeAttribute("cart"); // Xoá giỏ hàng trong session sau khi tạo đơn hàng
-        session.removeAttribute("shippingAddress"); // Xoá địa chỉ giao hàng trong session sau khi tạo đơn hàng
-        session.removeAttribute("payment"); // Xoá thông tin thanh toán trong session sau khi tạo đơn hàng
-        return ResponseEntity.ok(this.orderService.convertToOrderPreviewResponse(order));
+        session.removeAttribute("cart"); // Xoá giỏ hàng trong session
+        session.removeAttribute("shippingAddress"); // Xoá địa chỉ giao hàng trong session
+        session.removeAttribute("payment"); // Xoá thông tin thanh toán trong session
+        return ResponseEntity.ok(this.orderService.convertToOrderCreationResponse(order));
     }
 
     @GetMapping
@@ -177,15 +178,13 @@ public class OrderController {
 
     @PutMapping
     @ApiMessage("Cập nhật trạng thái đơn hàng thành công")
-    public ResponseEntity<String> updateOrderStatus(
+    public ResponseEntity<OrderStatusUpdateResponse> updateOrderStatus(
             @Valid @RequestBody OrderStatusUpdateRequest request) throws IdInvalidException {
         Order order = this.orderService.updateOrderStatus(request);
         if (order == null) {
             throw new IdInvalidException("Đơn hàng với id = " + request.getId() + " không tồn tại");
         }
-        this.orderService.convertToOrderFoundResponse(order);
-        return ResponseEntity
-                .ok("Đơn hàng với id = " + request.getId() + " đã được cập nhật trạng thái thành " + order.getStatus());
+        return ResponseEntity.ok(this.orderService.convertToOrderStatusUpdateResponse(order));
     }
 
     @PostMapping("/{orderId}/cancel")

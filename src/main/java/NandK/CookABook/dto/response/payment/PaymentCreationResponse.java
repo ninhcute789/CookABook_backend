@@ -20,9 +20,8 @@ public class PaymentCreationResponse {
     private Integer amount;
     private PaymentMethodEnum method;
     private PaymentStatusEnum status;
-
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss a", timezone = "GMT+7")
-    private Instant createdAt;
-
     private Long userId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+7")
+    private Instant createdAt;
 }

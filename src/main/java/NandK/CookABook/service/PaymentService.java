@@ -44,8 +44,8 @@ public class PaymentService {
                 payment.getAmount(),
                 payment.getMethod(),
                 payment.getStatus(),
-                payment.getCreatedAt(),
-                payment.getUser().getId());
+                payment.getUser().getId(),
+                payment.getCreatedAt());
         return response;
     }
 
@@ -75,10 +75,10 @@ public class PaymentService {
                 payment.getAmount(),
                 payment.getMethod(),
                 payment.getStatus(),
-                payment.getCreatedAt(),
-                payment.getUpdatedAt(),
                 payment.getOrder().getId(),
-                payment.getUser().getId());
+                payment.getUser().getId(),
+                payment.getUpdatedAt(),
+                payment.getCreatedAt());
         return response;
     }
 
@@ -109,7 +109,9 @@ public class PaymentService {
                 payment.getAmount(),
                 payment.getMethod(),
                 payment.getStatus(),
-                payment.getCreatedAt());
+                payment.getOrder().getId(),
+                payment.getUser().getId(),
+                payment.getUpdatedAt());
         return response;
     }
 
