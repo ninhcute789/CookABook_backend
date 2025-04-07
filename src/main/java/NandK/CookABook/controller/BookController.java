@@ -27,6 +27,7 @@ import NandK.CookABook.exception.IdInvalidException;
 import NandK.CookABook.service.AuthorService;
 import NandK.CookABook.service.BookService;
 import NandK.CookABook.service.CategoryService;
+import NandK.CookABook.service.OrderItemService;
 import NandK.CookABook.utils.annotation.ApiMessage;
 import jakarta.validation.Valid;
 
@@ -35,15 +36,16 @@ import jakarta.validation.Valid;
 public class BookController {
 
     private final BookService bookService;
-
     private final CategoryService categoryService;
-
     private final AuthorService authorService;
+    private final OrderItemService orderItemService;
 
-    public BookController(BookService bookService, CategoryService categoryService, AuthorService authorService) {
+    public BookController(BookService bookService, CategoryService categoryService, AuthorService authorService,
+            OrderItemService orderItemService) {
         this.authorService = authorService;
         this.categoryService = categoryService;
         this.bookService = bookService;
+        this.orderItemService = orderItemService;
     }
 
     @PostMapping
@@ -126,6 +128,9 @@ public class BookController {
         Book book = this.bookService.getBookById(bookId);
         if (book == null) {
             throw new IdInvalidException("Không tìm thấy sách với id: " + bookId);
+        }
+        if (this.orderItemService.isBookExistInOrderItem(book)) {
+            throw new IdInvalidException("Không thể xóa sách này vì nó đang tồn tại trong đơn hàng");
         }
         this.bookService.deleteBook(book);
         return ResponseEntity.ok(null);

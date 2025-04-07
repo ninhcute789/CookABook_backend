@@ -77,8 +77,8 @@ public class PaymentService {
                 payment.getStatus(),
                 payment.getOrder().getId(),
                 payment.getUser().getId(),
-                payment.getUpdatedAt(),
-                payment.getCreatedAt());
+                payment.getCreatedAt(),
+                payment.getUpdatedAt());
         return response;
     }
 

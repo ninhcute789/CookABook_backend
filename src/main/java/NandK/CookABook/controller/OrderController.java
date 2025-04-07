@@ -1,6 +1,5 @@
 package NandK.CookABook.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.turkraft.springfilter.boot.Filter;
 
-import NandK.CookABook.dto.request.cart.AddToCartRequest;
 import NandK.CookABook.dto.request.order.OrderCreationFromUserIdRequest;
 import NandK.CookABook.dto.request.order.OrderStatusUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
@@ -28,14 +26,11 @@ import NandK.CookABook.dto.response.order.OrderCreationResponse;
 import NandK.CookABook.dto.response.order.OrderFoundResponse;
 import NandK.CookABook.dto.response.order.OrderStatusUpdateResponse;
 import NandK.CookABook.entity.Cart;
-import NandK.CookABook.entity.CartItem;
 import NandK.CookABook.entity.Order;
-import NandK.CookABook.entity.OrderItem;
 import NandK.CookABook.entity.Payment;
 import NandK.CookABook.entity.ShippingAddress;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
-import NandK.CookABook.service.CartItemService;
 import NandK.CookABook.service.CartService;
 import NandK.CookABook.service.OrderService;
 import NandK.CookABook.service.PaymentService;
@@ -54,18 +49,15 @@ public class OrderController {
     private final OrderService orderService;
     private final UserService userService;
     private final CartService cartService;
-    private final CartItemService cartItemService;
     private final ShippingAddressService shippingAddressService;
     private final PaymentService paymentService;
 
     public OrderController(HttpSession session, OrderService orderService, UserService userService,
-            CartService cartService, CartItemService cartItemService,
-            ShippingAddressService shippingAddressService, PaymentService paymentService) {
+            CartService cartService, ShippingAddressService shippingAddressService, PaymentService paymentService) {
         this.session = session;
         this.orderService = orderService;
         this.userService = userService;
         this.cartService = cartService;
-        this.cartItemService = cartItemService;
         this.shippingAddressService = shippingAddressService;
         this.paymentService = paymentService;
     }
@@ -206,19 +198,9 @@ public class OrderController {
         if (order == null) {
             throw new IdInvalidException("Đơn hàng với id = " + orderId + " không tồn tại");
         }
-        List<CartItemResponse> cartItemResponses = new ArrayList<>();
-        List<OrderItem> orderItems = order.getOrderItems();
-        for (OrderItem orderItem : orderItems) {
-            AddToCartRequest addToCartRequest = new AddToCartRequest(order.getUser().getCart().getId(),
-                    orderItem.getBook().getId(), orderItem.getQuantity());
-            CartItem cartItem = this.cartService.addToCart(addToCartRequest);
-            if (cartItem == null) {
-                throw new IdInvalidException(
-                        "Giỏ hàng với id = " + order.getUser().getCart().getId() + " hoặc sách với id = "
-                                + orderItem.getBook().getId() + " không hợp lệ");
-            }
-            this.cartItemService.updateCartItemSelection(cartItem);
-            cartItemResponses.add(this.cartItemService.convertToCartItemResponse(cartItem));
+        List<CartItemResponse> cartItemResponses = this.orderService.reorder(order);
+        if (cartItemResponses == null) {
+            throw new IdInvalidException("Đã xảy ra lỗi trong quá trình reorder với đơn hàng có id = " + orderId);
         }
         return ResponseEntity.ok(cartItemResponses);
     }

@@ -7,10 +7,18 @@ import org.springframework.stereotype.Service;
 
 import NandK.CookABook.dto.response.order.OrderItemFoundResponse;
 import NandK.CookABook.dto.response.order.OrderItemPreviewResponse;
+import NandK.CookABook.entity.Book;
 import NandK.CookABook.entity.OrderItem;
+import NandK.CookABook.repository.OrderItemRepository;
 
 @Service
 public class OrderItemService {
+
+    private final OrderItemRepository orderItemRepository;
+
+    public OrderItemService(OrderItemRepository orderItemRepository) {
+        this.orderItemRepository = orderItemRepository;
+    }
 
     public List<OrderItemPreviewResponse> convertToOrderItemPreviewResponse(List<OrderItem> orderItems) {
         List<OrderItemPreviewResponse> orderItemPreviewResponses = new ArrayList<>();
@@ -48,5 +56,9 @@ public class OrderItemService {
             orderItemFoundResponses.add(orderItemFoundResponse);
         }
         return orderItemFoundResponses;
+    }
+
+    public boolean isBookExistInOrderItem(Book book) {
+        return this.orderItemRepository.existsByBook(book);
     }
 }
