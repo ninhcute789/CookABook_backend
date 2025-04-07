@@ -74,7 +74,9 @@ public class CartService {
                 existingCartItem.setDiscountPrice(
                         (book.getOriginalPrice() - book.getFinalPrice()) * existingCartItem.getQuantity());
                 existingCartItem.setFinalPrice(book.getFinalPrice() * existingCartItem.getQuantity());
-                existingCartItem.setSelected(true);
+                if (!existingCartItem.getSelected()) {
+                    this.cartItemService.updateCartItemSelection(existingCartItem);
+                }
                 // Cập nhật thông tin CartItem
                 return this.cartItemRepository.save(existingCartItem);
             } else {
