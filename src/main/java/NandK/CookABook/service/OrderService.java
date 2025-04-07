@@ -244,9 +244,6 @@ public class OrderService {
             if (cartItem == null) {
                 return null;
             }
-            if (cartItem.getSelected()) {
-                this.cartItemService.updateCartItemSelection(cartItem);
-            }
             cartItemResponses.add(this.cartItemService.convertToCartItemResponse(cartItem));
         }
         return cartItemResponses;
@@ -254,5 +251,16 @@ public class OrderService {
 
     public void deleteOrder(Order order) {
         this.orderRepository.delete(order);
+    }
+
+    public Long getTotalRevenue() {
+        List<Order> orders = this.orderRepository.findAll();
+        Long revenue = 0L;
+        for (Order order : orders) {
+            if (order.getStatus() == OrderStatusEnum.COMPLETED) {
+                revenue += order.getTotalFinalPrice();
+            }
+        }
+        return revenue;
     }
 }

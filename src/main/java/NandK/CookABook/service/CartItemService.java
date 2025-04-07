@@ -112,4 +112,8 @@ public class CartItemService {
         }
         this.cartItemRepository.save(cartItem); // Lưu lại thay đổi
     }
+
+    public void saveCartItem(CartItem cartItem) {
+        this.cartItemRepository.save(cartItem);
+    }
 }

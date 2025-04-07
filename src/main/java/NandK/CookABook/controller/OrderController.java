@@ -168,6 +168,13 @@ public class OrderController {
         return ResponseEntity.ok(this.orderService.convertToOrderFoundResponse(order));
     }
 
+    @GetMapping("/total-revenue")
+    @ApiMessage("Lấy tổng doanh thu thành công")
+    public ResponseEntity<Long> getTotalRevenue() {
+        Long totalRevenue = this.orderService.getTotalRevenue();
+        return ResponseEntity.ok(totalRevenue);
+    }
+
     @PutMapping
     @ApiMessage("Cập nhật trạng thái đơn hàng thành công")
     public ResponseEntity<OrderStatusUpdateResponse> updateOrderStatus(
