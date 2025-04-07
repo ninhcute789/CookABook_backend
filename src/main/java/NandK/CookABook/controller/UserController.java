@@ -132,6 +132,10 @@ public class UserController {
             if (!isPasswordValid) {
                 throw new IdInvalidException("Mật khẩu cũ không đúng, vui lòng kiểm tra lại");
             }
+            boolean isNewPasswordValid = this.passwordEncoder.matches(request.getNewPassword(), user.getPassword());
+            if (isNewPasswordValid) {
+                throw new IdInvalidException("Mật khẩu mới không được giống với mật khẩu cũ");
+            }
             String hashPassword = this.passwordEncoder.encode(request.getNewPassword());
             user.setPassword(hashPassword);
             this.userService.saveUser(user);
