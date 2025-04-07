@@ -138,9 +138,6 @@ public class UserService {
 
     public User updateUser(UserUpdateRequest request) {
         User user = this.getUserById(request.getId());
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            user.setPassword(request.getPassword());
-        }
         if (request.getName() != null && !request.getName().isBlank()) {
             user.setName(request.getName());
         }
@@ -157,6 +154,10 @@ public class UserService {
             user.setAvatar(request.getAvatar());
         }
         return this.userRepository.save(user);
+    }
+
+    public void saveUser(User user) {
+        this.userRepository.save(user);
     }
 
     public void deleteUser(User user) {

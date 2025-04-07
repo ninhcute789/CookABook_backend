@@ -9,8 +9,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import NandK.CookABook.dto.request.cart.AddToCartRequest;
 import NandK.CookABook.dto.request.order.OrderStatusUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
+import NandK.CookABook.dto.response.cart.CartItemResponse;
 import NandK.CookABook.dto.response.order.OrderCreationResponse;
 import NandK.CookABook.dto.response.order.OrderFoundResponse;
 import NandK.CookABook.dto.response.order.OrderItemFoundResponse;
@@ -36,14 +38,17 @@ public class OrderService {
     private final PaymentRepository paymentRepository;
     private final OrderItemService orderItemService;
     private final CartService cartService;
+    private final CartItemService cartItemService;
 
     public OrderService(OrderRepository orderRepository, OrderItemRepository orderItemRepository,
-            PaymentRepository paymentRepository, OrderItemService orderItemService, CartService cartService) {
+            PaymentRepository paymentRepository, OrderItemService orderItemService, CartService cartService,
+            CartItemService cartItemService) {
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.paymentRepository = paymentRepository;
         this.orderItemService = orderItemService;
         this.cartService = cartService;
+        this.cartItemService = cartItemService;
     }
 
     public Order createOrder(User user, Cart cart, ShippingAddress shippingAddress, Payment payment) {
@@ -227,6 +232,24 @@ public class OrderService {
     public void cancelOrder(Order order) {
         order.setStatus(OrderStatusEnum.CANCELLED);
         this.orderRepository.save(order);
+    }
+
+    public List<CartItemResponse> reorder(Order order) {
+        List<CartItemResponse> cartItemResponses = new ArrayList<>();
+        List<OrderItem> orderItems = order.getOrderItems();
+        for (OrderItem orderItem : orderItems) {
+            AddToCartRequest addToCartRequest = new AddToCartRequest(order.getUser().getCart().getId(),
+                    orderItem.getBook().getId(), orderItem.getQuantity());
+            CartItem cartItem = this.cartService.addToCart(addToCartRequest);
+            if (cartItem == null) {
+                return null;
+            }
+            if (cartItem.getSelected()) {
+                this.cartItemService.updateCartItemSelection(cartItem);
+            }
+            cartItemResponses.add(this.cartItemService.convertToCartItemResponse(cartItem));
+        }
+        return cartItemResponses;
     }
 
     public void deleteOrder(Order order) {

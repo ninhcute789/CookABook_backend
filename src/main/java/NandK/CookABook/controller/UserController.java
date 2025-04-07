@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.turkraft.springfilter.boot.Filter;
 
 import NandK.CookABook.dto.request.user.UserCreationRequest;
+import NandK.CookABook.dto.request.user.UserPasswordUpdateRequest;
 import NandK.CookABook.dto.request.user.UserUpdateRequest;
 import NandK.CookABook.dto.response.ResultPagination;
 import NandK.CookABook.dto.response.user.UserCreationResponse;
@@ -119,6 +120,25 @@ public class UserController {
         }
         user = this.userService.updateUser(request);
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserUpdateResponse(user));
+    }
+
+    @PutMapping("/update-password")
+    @ApiMessage("Cập nhật mật khẩu người dùng thành công")
+    public ResponseEntity<Void> updateUserPassword(@Valid @RequestBody UserPasswordUpdateRequest request)
+            throws IdInvalidException {
+        if (this.userService.isUsernameExist(request.getUsername())) {
+            User user = this.userService.getUserByUsername(request.getUsername());
+            boolean isPasswordValid = this.passwordEncoder.matches(request.getOldPassword(), user.getPassword());
+            if (!isPasswordValid) {
+                throw new IdInvalidException("Mật khẩu cũ không đúng, vui lòng kiểm tra lại");
+            }
+            String hashPassword = this.passwordEncoder.encode(request.getNewPassword());
+            user.setPassword(hashPassword);
+            this.userService.saveUser(user);
+            return ResponseEntity.status(HttpStatus.OK).body(null); // password updated successfully
+        } else {
+            throw new IdInvalidException("Username " + request.getUsername() + " không tồn tại, vui lòng kiểm tra lại");
+        }
     }
 
     @DeleteMapping("/{userId}")
