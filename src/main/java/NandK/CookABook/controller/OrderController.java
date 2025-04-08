@@ -37,6 +37,8 @@ import NandK.CookABook.service.PaymentService;
 import NandK.CookABook.service.ShippingAddressService;
 import NandK.CookABook.service.UserService;
 import NandK.CookABook.utils.annotation.ApiMessage;
+import NandK.CookABook.utils.constant.OrderStatusEnum;
+import NandK.CookABook.utils.constant.PaymentStatusEnum;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
@@ -179,10 +181,16 @@ public class OrderController {
     @ApiMessage("Cập nhật trạng thái đơn hàng thành công")
     public ResponseEntity<OrderStatusUpdateResponse> updateOrderStatus(
             @Valid @RequestBody OrderStatusUpdateRequest request) throws IdInvalidException {
-        Order order = this.orderService.updateOrderStatus(request);
+        Order order = this.orderService.getOrderById(request.getId());
         if (order == null) {
             throw new IdInvalidException("Đơn hàng với id = " + request.getId() + " không tồn tại");
         }
+        if (request.getStatus() == OrderStatusEnum.COMPLETED
+                && order.getPayment().getStatus() != PaymentStatusEnum.COMPLETED) {
+            throw new IdInvalidException("Đơn hàng với id = " + request.getId()
+                    + " không thể hoàn thành vì trạng thái thanh toán không hợp lệ");
+        }
+        order = this.orderService.updateOrderStatus(request, order);
         return ResponseEntity.ok(this.orderService.convertToOrderStatusUpdateResponse(order));
     }
 
@@ -193,7 +201,11 @@ public class OrderController {
         if (order == null) {
             throw new IdInvalidException("Đơn hàng với id = " + orderId + " không tồn tại");
         }
-        this.orderService.cancelOrder(order);
+        if (order.getStatus() == OrderStatusEnum.PENDING || order.getStatus() == OrderStatusEnum.CONFIRMED) {
+            this.orderService.cancelOrder(order);
+        } else {
+            throw new IdInvalidException("Đơn hàng với id = " + orderId + " không thể huỷ vì trạng thái không hợp lệ");
+        }
         return ResponseEntity.ok("Đơn hàng với id = " + orderId + " đã được huỷ thành công");
     }
 
@@ -219,7 +231,12 @@ public class OrderController {
         if (order == null) {
             throw new IdInvalidException("Đơn hàng với id = " + orderId + " không tồn tại");
         }
-        this.orderService.deleteOrder(order);
+        if (order.getStatus() == OrderStatusEnum.COMPLETED || order.getStatus() == OrderStatusEnum.CANCELLED
+                || order.getStatus() == OrderStatusEnum.RETURNED) {
+            this.orderService.deleteOrder(order);
+        } else {
+            throw new IdInvalidException("Đơn hàng với id = " + orderId + " không thể xoá vì trạng thái không hợp lệ");
+        }
         return ResponseEntity.ok(null);
     }
 }

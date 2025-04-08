@@ -52,7 +52,6 @@ public class Order {
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)
     @JoinColumn(name = "payment_id")
-    // @JsonIgnore
     private Payment payment;
 
     @ManyToOne
