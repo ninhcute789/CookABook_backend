@@ -209,16 +209,11 @@ public class OrderService {
         return orderFoundResponse;
     }
 
-    public Order updateOrderStatus(OrderStatusUpdateRequest request) {
-        Order order = this.getOrderById(request.getId());
-        if (order != null) {
-            if (request.getStatus() != null) {
-                order.setStatus(request.getStatus());
-            }
-            return this.orderRepository.save(order);
-        } else {
-            return null;
+    public Order updateOrderStatus(OrderStatusUpdateRequest request, Order order) {
+        if (request.getStatus() != null) {
+            order.setStatus(request.getStatus());
         }
+        return this.orderRepository.save(order);
     }
 
     public OrderStatusUpdateResponse convertToOrderStatusUpdateResponse(Order order) {
