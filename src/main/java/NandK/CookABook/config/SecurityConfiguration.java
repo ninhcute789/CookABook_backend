@@ -48,7 +48,9 @@ public class SecurityConfiguration {
                                 "/api/v1/categories/all", "/api/v1/books/preview",
                                 "/api/v1/books/{bookId}/detail",
                                 "/api/v1/books/all-by-author-id/{authorId}/**",
-                                "/api/v1/books/all-by-category-id/{categoryId}/**").permitAll()
+                                "/api/v1/books/all-by-category-id/{categoryId}/**",
+                                "/api/v1/auth/forgot-password", "/api/v1/auth/check-token",
+                                "/api/v1/auth/reset-password").permitAll()
                                 .anyRequest().authenticated())
                 .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults())
                         .authenticationEntryPoint(customAuthenticationEntryPoint))
