@@ -37,8 +37,10 @@ public class ForgotPasswordService {
     public void sendResetCode(String email) {
         String code = generateCode();
         Instant expiry = Instant.now().plus(Duration.ofMinutes(10)); // Thời gian hết hạn 10 phút
-        this.passwordResetTokenRepository.deleteByEmail(email); // Xóa mã cũ nếu có
-
+        PasswordResetToken existingToken = this.passwordResetTokenRepository.findByEmail(email);
+        if (existingToken != null) {
+            this.passwordResetTokenRepository.delete(existingToken); // Xóa mã cũ nếu có
+        }
         PasswordResetToken token = new PasswordResetToken();
         token.setEmail(email);
         token.setToken(code);
