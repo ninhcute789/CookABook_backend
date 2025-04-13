@@ -37,6 +37,10 @@ public class UserService {
         return this.userRepository.existsByUsername(username);
     }
 
+    public boolean isEmailExist(String email) {
+        return this.userRepository.existsByEmail(email);
+    }
+
     public User createUser(UserCreationRequest request) {
         User user = new User();
 

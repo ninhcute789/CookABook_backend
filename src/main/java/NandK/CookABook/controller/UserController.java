@@ -60,6 +60,10 @@ public class UserController {
             throw new IdInvalidException(
                     "Username " + request.getUsername() + " đã tồn tại, vui lòng sử dụng username khác");
         }
+        boolean isEmailExist = this.userService.isEmailExist(request.getEmail());
+        if (isEmailExist) {
+            throw new IdInvalidException("Email " + request.getEmail() + " đã tồn tại, vui lòng sử dụng email khác");
+        }
         String hashPassword = this.passwordEncoder.encode(request.getPassword()); // ham encode tra ra String
         request.setPassword(hashPassword);
         User user = this.userService.createUser(request);

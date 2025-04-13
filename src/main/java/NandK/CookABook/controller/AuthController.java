@@ -19,16 +19,20 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import NandK.CookABook.dto.request.ForgotPasswordRequest;
+import NandK.CookABook.dto.request.passwordResetToken.ForgotPasswordRequest;
+import NandK.CookABook.dto.request.passwordResetToken.ResetPasswordRequest;
+import NandK.CookABook.dto.request.passwordResetToken.VerifyTokenRequest;
 import NandK.CookABook.dto.request.user.UserCreationRequest;
 import NandK.CookABook.dto.request.user.UserLoginRequest;
 import NandK.CookABook.dto.response.LoginResponse;
 import NandK.CookABook.dto.response.user.UserCreationResponse;
 import NandK.CookABook.entity.User;
 import NandK.CookABook.exception.IdInvalidException;
+import NandK.CookABook.service.ForgotPasswordService;
 import NandK.CookABook.service.UserService;
 import NandK.CookABook.utils.SecurityUtil;
 import NandK.CookABook.utils.annotation.ApiMessage;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 
 @RestController
@@ -41,16 +45,22 @@ public class AuthController {
     private final PasswordEncoder passwordEncoder;
     @Value("${cookabook.jwt.refresh-token-validity-in-seconds}")
     private long refreshTokenExpiration;
+    private final ForgotPasswordService forgotPasswordService;
+    private HttpSession session;
 
     private AuthController(
             AuthenticationManagerBuilder authenticationManagerBuilder,
             SecurityUtil securityUtil,
             UserService userService,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            ForgotPasswordService forgotPasswordService,
+            HttpSession session) {
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.securityUtil = securityUtil;
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.forgotPasswordService = forgotPasswordService;
+        this.session = session;
     }
 
     @PostMapping("/register")
@@ -204,11 +214,58 @@ public class AuthController {
                 .body(null);
     }
 
-    // TODO: complete change password
-    @PutMapping("/forgot-password")
-    @ApiMessage("Đổi mật khẩu thành công")
-    public ResponseEntity<String> forgotPassword(@RequestBody ForgotPasswordRequest request) {
-        // boolean isEmailExist = this.userService.isEmailExist(request.getEmail());
-        return ResponseEntity.status(HttpStatus.OK).body("Change password success");
+    // Yêu cầu gửi mã xác nhận đến email
+    @PostMapping("/forgot-password")
+    @ApiMessage("Đã gửi mã xác nhận đến email")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request)
+            throws IdInvalidException {
+        if (!this.forgotPasswordService.isEmailExists(request.getEmail())) {
+            throw new IdInvalidException("Email không tồn tại trong hệ thống");
+        }
+        session.removeAttribute("email");
+        this.forgotPasswordService.sendResetCode(request.getEmail());
+        session.setAttribute("email", request.getEmail());
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    // Yêu cầu đặt lại mật khẩu
+    @PostMapping("/check-token")
+    @ApiMessage("Mã xác nhận hợp lệ")
+    public ResponseEntity<Void> checkToken(@Valid @RequestBody VerifyTokenRequest request)
+            throws IdInvalidException {
+        String email = (String) session.getAttribute("email");
+        if (email == null) {
+            throw new IdInvalidException("Vui lòng yêu cầu mã xác nhận trước");
+        }
+        session.removeAttribute("token");
+        // kiểm tra mã xác nhận có hợp lệ không
+        if (!this.forgotPasswordService.isTokenValid(email, request.getToken())) {
+            throw new IdInvalidException("Mã xác nhận không hợp lệ hoặc đã hết hạn");
+        }
+        session.setAttribute("token", request.getToken());
+        return ResponseEntity.status(HttpStatus.OK).body(null);
+    }
+
+    // Đặt lại mật khẩu
+    @PutMapping("/reset-password")
+    @ApiMessage("Đặt lại mật khẩu thành công")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request)
+            throws IdInvalidException {
+        String email = (String) session.getAttribute("email");
+        String token = (String) session.getAttribute("token");
+        if (email == null || token == null) {
+            throw new IdInvalidException("Vui lòng yêu cầu mã xác nhận trước");
+        }
+        // kiểm tra mã xác nhận có hợp lệ không
+        if (!this.forgotPasswordService.isTokenValid(email, token)) {
+            throw new IdInvalidException("Mã xác nhận không hợp lệ hoặc đã hết hạn");
+        }
+        // đặt lại mật khẩu
+        String hashPassword = this.passwordEncoder.encode(request.getNewPassword());
+        this.forgotPasswordService.resetPassword(email, token, hashPassword);
+        // xóa thông tin trong session
+        session.removeAttribute("email");
+        session.removeAttribute("token");
+        return ResponseEntity.status(HttpStatus.OK).body(null);
     }
 }
