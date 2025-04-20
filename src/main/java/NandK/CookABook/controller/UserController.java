@@ -118,17 +118,12 @@ public class UserController {
         if (user == null) {
             throw new IdInvalidException("User với Id = " + request.getId() + " không tồn tại");
         }
-        if (request.getPassword() != null && !request.getPassword().isBlank()) {
-            String hashPassword = this.passwordEncoder.encode(request.getPassword());
-            request.setPassword(hashPassword);
-        }
         if (request.getEmail() != null && !request.getEmail().isBlank()) {
             boolean isEmailExist = this.userService.isEmailExist(request.getEmail());
             if (isEmailExist) {
                 throw new IdInvalidException(
                         "Email " + request.getEmail() + " đã tồn tại, vui lòng sử dụng email khác");
             }
-            request.setEmail(request.getEmail());
         }
         user = this.userService.updateUser(request);
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserUpdateResponse(user));
