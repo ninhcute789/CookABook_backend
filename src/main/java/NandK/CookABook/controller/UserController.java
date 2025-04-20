@@ -128,6 +128,7 @@ public class UserController {
                 throw new IdInvalidException(
                         "Email " + request.getEmail() + " đã tồn tại, vui lòng sử dụng email khác");
             }
+            request.setEmail(request.getEmail());
         }
         user = this.userService.updateUser(request);
         return ResponseEntity.status(HttpStatus.OK).body(this.userService.convertToUserUpdateResponse(user));
