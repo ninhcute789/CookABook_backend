@@ -151,6 +151,9 @@ public class UserService {
         if (request.getDob() != null) {
             user.setDob(request.getDob());
         }
+        if (request.getEmail() != null && !request.getEmail().isBlank()) {
+            user.setEmail(request.getEmail());
+        }
         if (request.getAvatar() != null && !request.getAvatar().isBlank()) {
             user.setAvatar(request.getAvatar());
         }
