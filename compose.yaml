@@ -9,16 +9,16 @@
 # https://github.com/docker/awesome-compose
 services:
   server:
-    build:
-      context: .
+    image: ninhcute789/cookabook:1.0.0
     ports:
       - "8080:8080"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/cookabookdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
-      - DB_USERNAME=${DB_USERNAME}
-      - DB_PASSWORD=${DB_PASSWORD}
-      - MAIL_USERNAME=${MAIL_USERNAME}
-      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - DB_USERNAME=${DB_USERNAME:-root}
+      - DB_PASSWORD=${DB_PASSWORD:-password}
+      - MAIL_USERNAME=${MAIL_USERNAME:-info@example.com}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-placeholder}
+      - SPRING_PROFILES_ACTIVE=docker
     depends_on:
       db:
         condition: service_healthy
@@ -30,14 +30,15 @@ services:
     restart: always
     environment:
       - MYSQL_DATABASE=cookabookdb
-      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD:-password}
       - MYSQL_ROOT_HOST=%
     ports:
       - "3307:3306" # ĐỔI CỔNG TỪ 3306 SANG 3307
     volumes:
       - db-data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD}"]
+      test:
+        ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASSWORD:-password}"]
       interval: 10s
       timeout: 5s
       retries: 5

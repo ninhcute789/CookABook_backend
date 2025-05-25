@@ -53,11 +53,14 @@ COPY --from=build /app/target/*.jar app.jar
 # Set active profile to docker
 ENV SPRING_PROFILES_ACTIVE=docker
 
-# Default values for environment variables (sẽ bị ghi đè bởi biến môi trường từ compose)
-ENV DB_USERNAME=default_user
-ENV DB_PASSWORD=default_password
-ENV MAIL_USERNAME=default@example.com
-ENV MAIL_PASSWORD=default_mail_password
+# Giá trị mặc định đủ để khởi động ứng dụng
+ENV DB_USERNAME=root
+ENV DB_PASSWORD=password
+ENV MYSQL_ROOT_PASSWORD=password
+
+# Các giá trị email giả, không hoạt động nhưng không gây lỗi
+ENV MAIL_USERNAME=info@example.com
+ENV MAIL_PASSWORD=placeholder
 
 # Expose port
 EXPOSE 8080
